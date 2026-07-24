@@ -1,2 +1,53 @@
-Does this take over from readme?
-I guess it does
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Page</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f4f4f4;
+    font-family: sans-serif;
+  }
+
+  button {
+    padding: 16px 32px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+
+  button:hover {
+    background: #2db94b;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+</style>
+</head>
+<body>
+
+  <button id="myButton">Gief Loot</button>
+
+  <script>
+    document.getElementById('myButton').addEventListener('click', () => {
+      alert('Loot Soon!');
+    });
+  </script>
+
+</body>
+</html>
