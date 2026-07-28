@@ -1,53 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>My Page</title>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  body {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f4f4f4;
-    font-family: sans-serif;
-  }
+    <title>Charles Flood</title>
 
-  button {
-    padding: 16px 32px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    background: #4f46e5;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-
-  button:hover {
-    background: #2db94b;
-  }
-
-  button:active {
-    transform: scale(0.97);
-  }
-</style>
+    <link rel="stylesheet" href="main.css">
 </head>
+
 <body>
 
-  <button id="myButton">Gief Loot</button>
+    <header>
+        <nav>
+            <h1>Charles Flood</h1>
 
-  <script>
-    document.getElementById('myButton').addEventListener('click', () => {
-      alert('Loot Soon!');
-    });
-  </script>
+            <div>
+                <a href="#about">About</a>
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+            </div>
+        </nav>
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+            <h2>Hi, I'm Charles.</h2>
+
+            <p>
+                Welcome to my website.
+            </p>
+
+            <a href="#projects" class="button">
+                View My Projects
+            </a>
+        </section>
+
+
+        <section id="about">
+            <h2>About Me</h2>
+
+            <p>
+                Add a short introduction about yourself here.
+            </p>
+        </section>
+
+
+        <section id="projects">
+            <h2>Projects</h2>
+
+            <div class="project-card">
+
+                <h3>Loot Generator</h3>
+
+                <p>
+                    A JavaScript-based loot generator inspired
+                    by classic action RPGs.
+                </p>
+
+                <a href="loot/loot.html">
+                    Explore Project ->
+                </a>
+
+            </div>
+        </section>
+
+
+        <section id="skills">
+            <h2>Skills</h2>
+
+            <p>
+                HTML · CSS · JavaScript
+            </p>
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>© 2026 Charles Flood</p>
+    </footer>
 
 </body>
+
 </html>

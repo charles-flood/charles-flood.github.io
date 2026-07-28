@@ -1,0 +1,95 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #111827;
+    color: white;
+    line-height: 1.6;
+}
+
+header {
+    padding: 20px 40px;
+    border-bottom: 1px solid #374151;
+}
+
+nav {
+    max-width: 1000px;
+    margin: auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav div {
+    display: flex;
+    gap: 20px;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+main {
+    max-width: 1000px;
+    margin: auto;
+}
+
+section {
+    padding: 80px 40px;
+}
+
+.hero {
+    min-height: 500px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.hero h2 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.button {
+    padding: 12px 24px;
+    border: 1px solid white;
+    border-radius: 6px;
+}
+
+.project-card {
+    margin-top: 30px;
+    padding: 30px;
+    border: 1px solid #374151;
+    border-radius: 8px;
+}
+
+.project-card h3 {
+    margin-bottom: 10px;
+}
+
+.project-card p {
+    margin-bottom: 20px;
+}
+
+footer {
+    padding: 30px;
+    text-align: center;
+    border-top: 1px solid #374151;
+}
