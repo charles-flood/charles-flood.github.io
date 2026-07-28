@@ -4,17 +4,20 @@
 const rarities = [
         {
             name: "Common",
-            chance: 20
+            chance: 10
         },
         {
             name: "Magic",
-            chance: 60
+            chance: 90
         },
         {
             name: "Rare",
             chance: 10
         }
 ];
+
+const prefixChance = 50;
+const suffixChance = 50;
 
 
 // Generate a random number
@@ -63,56 +66,268 @@ function generateLoot() {
     };
 
 
-    // Generate stats depending on item type
+    // add base stats to item
     if (item.type === "Weapon") {
 
+        //weapon dmg stats are static
         loot.minDamage = item.minDamage;
         loot.maxDamage = item.maxDamage;
 
     } else if (item.type === "Armor") {
 
+        //armor stats are a range
         loot.defense = randomNumber(
             item.minDefense,
             item.maxDefense
         );
     }
 
-
     // Magic items get a bonus
     if (rarity === "Magic" && item.type === "Weapon") {
 
-        const pref = weaponPrefixes[
-        randomNumber(0, weaponPrefixes.length - 1)
-        ];
+        //roll for prefix/suffix/both
+        let hasPrefix = Math.random() * 100 < prefixChance;
+        let hasSuffix = Math.random() * 100 < suffixChance;
 
-        //alert(JSON.stringify(pref));
+        //item is magic, force at least 1 prefix or suffix if both rolled false
+        if(!hasPrefix && !hasSuffix){
 
-        loot.name = pref.name + " " + loot.name;
+            if (Math.random() < 0.5) {
+                hasPrefix = true;
+            } else {
+                hasSuffix = true;
+            }
 
-        if(!pref.modifier) {
+        }
+
+        // hasPrefix = true;
+        // hasSuffix = true;
+
+
+        //prefix
+        if(hasPrefix){
+
+            //grab prefix
+            const pref = weaponPrefixes[
+            randomNumber(0, weaponPrefixes.length - 1)
+            ];
+
+            //update item name
+            loot.name = pref.name + " " + loot.name;
+
+            //attach prefix
+            loot.prefix = pref;
             
-            loot.bonus = pref.type + pref.min.toString() + " - " + pref.max.toString();
+        }
 
-        }else{
+        //suffix
+        if(hasSuffix){
 
-            if(pref.type === "flat") {
+            //grab suffix
+            const suff = weaponSuffixes[
+            randomNumber(0, weaponSuffixes.length - 1)
+            ];
 
-                loot.minDamage = loot.minDamage + pref.min;
-                loot.maxDamage = loot.maxDamage + pref.max;
+            //update item name
+            loot.name = loot.name + " " + suff.name;
+
+            //attach prefix
+            loot.suffix = suff;
+
+        }
+
+        //alert(JSON.stringify(loot));
+
+        //add bonuses to item and adjust dmg if needed
+        if(hasPrefix && hasSuffix){
+
+            let pref = loot.prefix;
+            let suff = loot.suffix;
+
+
+            // cater for identical types first
+            if(pref.type == suff.type){
+
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        //get percentages
+                        let prefPercentage = parseInt(randomNumber(
+                            pref.min,
+                            pref.max
+                        ));
+                        let suffPercentage = parseInt(randomNumber(
+                            suff.min,
+                            suff.max
+                        ));
+
+                        let fullPercentage = prefPercentage + suffPercentage;
+
+                        loot.minDamage = increaseByPercentage(loot.minDamage, fullPercentage);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, fullPercentage);
+
+                        loot.bonus = pref.type + fullPercentage.toString() + "%";
+
+                    }else{
+
+                        loot.minDamage = loot.minDamage + pref.min + suff.min;
+                        loot.maxDamage = loot.maxDamage + pref.max + suff.max;
+
+                        loot.bonus = pref.type + (pref.min + suff.min).toString() + " - " + (pref.max + suff.max).toString()
+
+                    }
+                }
 
             }else{
 
-                var percentage = parseInt(randomNumber(
-                    pref.min,
-                    pref.max
-                ));
+                loot.bonus = [];
 
-                loot.minDamage = increaseByPercentage(loot.minDamage, percentage);
-                loot.maxDamage = increaseByPercentage(loot.maxDamage, percentage);
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        //get percentages
+                        let prefPercentage = parseInt(randomNumber(
+                            pref.min,
+                            pref.max
+                        ));
+
+                        loot.minDamage = increaseByPercentage(loot.minDamage, prefPercentage);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, prefPercentage);
+
+                        loot.bonus[0] = pref.type + prefPercentage.toString() + "%";
+
+                    }else{
+
+                        loot.minDamage = loot.minDamage + pref.min;
+                        loot.maxDamage = loot.maxDamage + pref.max;
+
+                        loot.bonus[0] = pref.type + pref.min.toString() + " - " + pref.max.toString();
+
+                    }
+
+                }else{
+
+                    let value = randomNumber(pref.min, pref.max);
+
+                    loot.bonus[0] = pref.type + value.toString();
+
+                }
+
+                if(suff.modifier){
+
+                    if(suff.type.includes("increased")){
+
+                        //get percentages
+                        let suffPercentage = parseInt(randomNumber(
+                            suff.min,
+                            suff.max
+                        ));
+
+                        loot.minDamage = increaseByPercentage(loot.minDamage, suffPercentage);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, suffPercentage);
+
+                        loot.bonus[1] = suff.type + suffPercentage.toString() + "%";
+
+                    }else{
+
+                        loot.minDamage = loot.minDamage + suff.min;
+                        loot.maxDamage = loot.maxDamage + suff.max;
+
+                        loot.bonus[1] = suff.type + suff.min.toString() + " - " + suff.max.toString();
+
+                    }
+
+                }else{
+
+                    let value = randomNumber(suff.min, suff.max);
+
+                    loot.bonus[1] = suff.type + value.toString();
+
+                }
+            }
+        }else if(hasPrefix) {
+
+            let pref = loot.prefix;
+
+            if(pref.modifier){
+
+                if(pref.type.includes("increased")){
+
+                    //get percentages
+                    let prefPercentage = parseInt(randomNumber(
+                        pref.min,
+                        pref.max
+                    ));
+
+                    loot.minDamage = increaseByPercentage(loot.minDamage, prefPercentage);
+                    loot.maxDamage = increaseByPercentage(loot.maxDamage, prefPercentage);
+
+                    loot.bonus = pref.type + prefPercentage.toString() + "%";
+
+                }else{
+
+                    loot.minDamage = loot.minDamage + pref.min;
+                    loot.maxDamage = loot.maxDamage + pref.max;
+
+                    loot.bonus = pref.type + pref.min.toString() + " - " + pref.max.toString();
+
+                }
+
+            }else{
+
+                let value = randomNumber(pref.min, pref.max);
+
+                loot.bonus = pref.type + value.toString();
+
+            }
+            
+
+        }else if(hasSuffix) {
+
+            let suff = loot.suffix;
+
+            if(suff.modifier){
+
+                if(suff.type.includes("increased")){
+
+                    //get percentages
+                    let suffPercentage = parseInt(randomNumber(
+                        suff.min,
+                        suff.max
+                    ));
+
+                    loot.minDamage = increaseByPercentage(loot.minDamage, suffPercentage);
+                    loot.maxDamage = increaseByPercentage(loot.maxDamage, suffPercentage);
+
+                    loot.bonus = suff.type + suffPercentage.toString() + "%";
+
+                }else{
+
+                    loot.minDamage = loot.minDamage + suff.min;
+                    loot.maxDamage = loot.maxDamage + suff.max;
+
+                    loot.bonus = suff.type + suff.min.toString() + " - " + suff.max.toString();
+
+                }
+
+            }else{
+
+                let value = randomNumber(suff.min, suff.max);
+
+                loot.bonus = suff.type + value.toString();
 
             }
 
         }
+
+    // TODO : refactor how affixes are attached
+
+    }else if(rarity === "Magic" && item.type === "Armor") {
+        //add some armor lootage
+        
+
 
     }
 
@@ -162,17 +377,16 @@ function displayLoot(loot) {
 
         if (Array.isArray(loot.bonus)) {
 
-            html += `<p>Bonuses:</p><ul>`;
 
             loot.bonus.forEach(bonus => {
-                html += `<li>${bonus}</li>`;
+                html += `<p>${bonus}</p>`;
             });
 
             html += `</ul>`;
 
         } else {
 
-            html += `<p>Bonus: ${loot.bonus}</p>`;
+            html += `<p>${loot.bonus}</p>`;
 
         }
     }
