@@ -85,7 +85,7 @@ function generateLoot() {
         randomNumber(0, weaponPrefixes.length - 1)
         ];
 
-        alert(JSON.stringify(pref));
+        //alert(JSON.stringify(pref));
 
         loot.name = pref.name + " " + loot.name;
 
