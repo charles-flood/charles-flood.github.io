@@ -8,11 +8,11 @@ const rarities = [
         },
         {
             name: "Magic",
-            chance: 90
+            chance: 10
         },
         {
             name: "Rare",
-            chance: 10
+            chance: 90
         }
 ];
 
@@ -43,7 +43,7 @@ function generateRarity() {
 }
 
 function increaseByPercentage(value, percentage) {
-    return Math.round(value * (1 + percentage / 100));
+    return parseInt(Math.round(value * (1 + percentage / 100)));
 }
 
 
@@ -103,6 +103,8 @@ function generateLoot() {
         // hasPrefix = true;
         // hasSuffix = true;
 
+        let prefWeaponModifier = 0;
+        let suffWeaponModifier = 0;
 
         //prefix
         if(hasPrefix){
@@ -117,6 +119,8 @@ function generateLoot() {
 
             //attach prefix
             loot.prefix = pref;
+
+            prefWeaponModifier = randomNumber(pref.min, pref.max);
             
         }
 
@@ -134,6 +138,8 @@ function generateLoot() {
             //attach prefix
             loot.suffix = suff;
 
+            suffWeaponModifier = randomNumber(suff.min, suff.max);
+
         }
 
         //alert(JSON.stringify(loot));
@@ -144,7 +150,6 @@ function generateLoot() {
             let pref = loot.prefix;
             let suff = loot.suffix;
 
-
             // cater for identical types first
             if(pref.type == suff.type){
 
@@ -152,17 +157,7 @@ function generateLoot() {
 
                     if(pref.type.includes("increased")){
 
-                        //get percentages
-                        let prefPercentage = parseInt(randomNumber(
-                            pref.min,
-                            pref.max
-                        ));
-                        let suffPercentage = parseInt(randomNumber(
-                            suff.min,
-                            suff.max
-                        ));
-
-                        let fullPercentage = prefPercentage + suffPercentage;
+                        let fullPercentage = prefWeaponModifier + suffWeaponModifier;
 
                         loot.minDamage = increaseByPercentage(loot.minDamage, fullPercentage);
                         loot.maxDamage = increaseByPercentage(loot.maxDamage, fullPercentage);
@@ -187,16 +182,10 @@ function generateLoot() {
 
                     if(pref.type.includes("increased")){
 
-                        //get percentages
-                        let prefPercentage = parseInt(randomNumber(
-                            pref.min,
-                            pref.max
-                        ));
+                        loot.minDamage = increaseByPercentage(loot.minDamage, prefWeaponModifier);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, prefWeaponModifier);
 
-                        loot.minDamage = increaseByPercentage(loot.minDamage, prefPercentage);
-                        loot.maxDamage = increaseByPercentage(loot.maxDamage, prefPercentage);
-
-                        loot.bonus[0] = pref.type + prefPercentage.toString() + "%";
+                        loot.bonus[0] = pref.type + prefWeaponModifier.toString() + "%";
 
                     }else{
 
@@ -209,9 +198,7 @@ function generateLoot() {
 
                 }else{
 
-                    let value = randomNumber(pref.min, pref.max);
-
-                    loot.bonus[0] = pref.type + value.toString();
+                    loot.bonus[0] = pref.type + prefWeaponModifier.toString();
 
                 }
 
@@ -219,16 +206,10 @@ function generateLoot() {
 
                     if(suff.type.includes("increased")){
 
-                        //get percentages
-                        let suffPercentage = parseInt(randomNumber(
-                            suff.min,
-                            suff.max
-                        ));
+                        loot.minDamage = increaseByPercentage(loot.minDamage, suffWeaponModifier);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, suffWeaponModifier);
 
-                        loot.minDamage = increaseByPercentage(loot.minDamage, suffPercentage);
-                        loot.maxDamage = increaseByPercentage(loot.maxDamage, suffPercentage);
-
-                        loot.bonus[1] = suff.type + suffPercentage.toString() + "%";
+                        loot.bonus[1] = suff.type + suffWeaponModifier.toString() + "%";
 
                     }else{
 
@@ -241,9 +222,7 @@ function generateLoot() {
 
                 }else{
 
-                    let value = randomNumber(suff.min, suff.max);
-
-                    loot.bonus[1] = suff.type + value.toString();
+                    loot.bonus[1] = suff.type + suffWeaponModifier.toString();
 
                 }
             }
@@ -255,16 +234,10 @@ function generateLoot() {
 
                 if(pref.type.includes("increased")){
 
-                    //get percentages
-                    let prefPercentage = parseInt(randomNumber(
-                        pref.min,
-                        pref.max
-                    ));
+                    loot.minDamage = increaseByPercentage(loot.minDamage, prefWeaponModifier);
+                    loot.maxDamage = increaseByPercentage(loot.maxDamage, prefWeaponModifier);
 
-                    loot.minDamage = increaseByPercentage(loot.minDamage, prefPercentage);
-                    loot.maxDamage = increaseByPercentage(loot.maxDamage, prefPercentage);
-
-                    loot.bonus = pref.type + prefPercentage.toString() + "%";
+                    loot.bonus = pref.type + prefWeaponModifier.toString() + "%";
 
                 }else{
 
@@ -277,9 +250,7 @@ function generateLoot() {
 
             }else{
 
-                let value = randomNumber(pref.min, pref.max);
-
-                loot.bonus = pref.type + value.toString();
+                loot.bonus = pref.type + prefWeaponModifier.toString();
 
             }
             
@@ -292,16 +263,10 @@ function generateLoot() {
 
                 if(suff.type.includes("increased")){
 
-                    //get percentages
-                    let suffPercentage = parseInt(randomNumber(
-                        suff.min,
-                        suff.max
-                    ));
+                    loot.minDamage = increaseByPercentage(loot.minDamage, suffWeaponModifier);
+                    loot.maxDamage = increaseByPercentage(loot.maxDamage, suffWeaponModifier);
 
-                    loot.minDamage = increaseByPercentage(loot.minDamage, suffPercentage);
-                    loot.maxDamage = increaseByPercentage(loot.maxDamage, suffPercentage);
-
-                    loot.bonus = suff.type + suffPercentage.toString() + "%";
+                    loot.bonus = suff.type + suffWeaponModifier.toString() + "%";
 
                 }else{
 
@@ -314,22 +279,11 @@ function generateLoot() {
 
             }else{
 
-                let value = randomNumber(suff.min, suff.max);
-
-                loot.bonus = suff.type + value.toString();
+                loot.bonus = suff.type + suffWeaponModifier.toString();
 
             }
 
         }
-
-    // TODO : refactor how affixes are attached
-    /*
-
-        ==============================================================================================================================================================================
-        CLEAN THIS SHIT UP
-        ==============================================================================================================================================================================
-
-    */
 
     }else if(rarity === "Magic" && item.type === "Armor") {
                 
@@ -351,13 +305,15 @@ function generateLoot() {
         // hasPrefix = true;
         // hasSuffix = true;
 
+        let prefModifier = 0;
+        let suffModifier = 0;
 
         //prefix
         if(hasPrefix){
 
             //grab prefix
             const pref = armorPrefixes[
-            randomNumber(0, armorPrefixes.length - 1)
+            randomNumber(0, armorPrefixes.length - 1) 
             ];
 
             //update item name
@@ -365,6 +321,8 @@ function generateLoot() {
 
             //attach prefix
             loot.prefix = pref;
+
+            prefModifier = randomNumber(pref.min, pref.max);
             
         }
 
@@ -382,6 +340,8 @@ function generateLoot() {
             //attach prefix
             loot.suffix = suff;
 
+            suffModifier = randomNumber(suff.min, suff.max);
+
         }
 
 
@@ -393,7 +353,6 @@ function generateLoot() {
             let pref = loot.prefix;
             let suff = loot.suffix;
 
-
             // cater for identical types first
             if(pref.type == suff.type){
 
@@ -401,32 +360,15 @@ function generateLoot() {
 
                     if(pref.type.includes("increased")){
 
-                        //get percentages
-                        let prefPercentage = parseInt(randomNumber(
-                            pref.min,
-                            pref.max
-                        ));
-                        let suffPercentage = parseInt(randomNumber(
-                            suff.min,
-                            suff.max
-                        ));
-
-                        let fullPercentage = prefPercentage + suffPercentage;
-
-
+                        let fullPercentage = prefModifier + suffModifier;
                         loot.defense = increaseByPercentage(loot.defense, fullPercentage);
                         
-
                         loot.bonus = pref.type + fullPercentage.toString() + "%";
 
                     }else{
 
-                        let prefDef = parseInt(randomNumber(pref.min, pref.max));
-                        let suffDef = parseInt(randomNumber(suff.min, suff.max));
-
-                        loot.defense = loot.defense + prefDef + suffDef;
-
-                        loot.bonus = pref.type + (prefDef + suffDef).toString();
+                        loot.defense = loot.defense + prefModifier + suffModifier;
+                        loot.bonus = pref.type + (prefModifier + suffModifier).toString();
 
                     }
                 }
@@ -439,29 +381,19 @@ function generateLoot() {
 
                     if(pref.type.includes("increased")){
 
-                        //get percentages
-                        let prefPercentage = parseInt(randomNumber(
-                            pref.min,
-                            pref.max
-                        ));
-
-                        loot.defense = increaseByPercentage(loot.defense, prefPercentage);
-                        
-                        loot.bonus[0] = pref.type + prefPercentage.toString() + "%";
+                        loot.defense = increaseByPercentage(loot.defense, prefModifier);
+                        loot.bonus[0] = pref.type + prefModifier.toString() + "%";
 
                     }else{
 
-                        let prefDef = parseInt(randomNumber(pref.min, pref.max));
-
-                        loot.bonus[0] = pref.type + prefDef.toString();
+                        loot.defense = loot.defense + prefModifier;
+                        loot.bonus[0] = pref.type + prefModifier.toString();
 
                     }
 
                 }else{
 
-                    let value = randomNumber(pref.min, pref.max);
-
-                    loot.bonus[0] = pref.type + value.toString();
+                    loot.bonus[0] = pref.type + prefModifier.toString();
 
                 }
 
@@ -469,31 +401,19 @@ function generateLoot() {
 
                     if(suff.type.includes("increased")){
 
-                        //get percentages
-                        let suffPercentage = parseInt(randomNumber(
-                            suff.min,
-                            suff.max
-                        ));
-
-                        loot.defense = increaseByPercentage(loot.defense, suffPercentage);
-
-                        loot.bonus[1] = suff.type + suffPercentage.toString() + "%";
+                        loot.defense = increaseByPercentage(loot.defense, suffModifier);
+                        loot.bonus[1] = suff.type + suffModifier.toString() + "%";
 
                     }else{
-                        
-                        let suffDef = parseInt(randomNumber(suff.min, suff.max));
 
-                        loot.defense = loot.defense + suffDef;
-
-                        loot.bonus[1] = suff.type + suffDef.toString();
+                        loot.defense = loot.defense + suffModifier;
+                        loot.bonus[1] = suff.type + suffModifier.toString();
 
                     }
 
                 }else{
 
-                    let value = randomNumber(suff.min, suff.max);
-
-                    loot.bonus[1] = suff.type + value.toString();
+                    loot.bonus[1] = suff.type + suffModifier.toString();
 
                 }
             }
@@ -505,34 +425,21 @@ function generateLoot() {
 
                 if(pref.type.includes("increased")){
 
-                    //get percentages
-                    let prefPercentage = parseInt(randomNumber(
-                        pref.min,
-                        pref.max
-                    ));
-
-                    loot.defense = increaseByPercentage(loot.defense, prefPercentage);
-
-                    loot.bonus = pref.type + prefPercentage.toString() + "%";
+                    loot.defense = increaseByPercentage(loot.defense, prefModifier);
+                    loot.bonus = pref.type + prefModifier.toString() + "%";
 
                 }else{
 
-                    let prefDef = parseInt(randomNumber(pref.min, pref.max));
-
-                    loot.defense = loot.defense + prefDef;
-
-                    loot.bonus = pref.type + prefDef.toString();
+                    loot.defense = loot.defense + prefModifier;
+                    loot.bonus = pref.type + prefModifier.toString();
 
                 }
 
             }else{
 
-                let value = randomNumber(pref.min, pref.max);
-
-                loot.bonus = pref.type + value.toString();
+                loot.bonus = pref.type + prefModifier.toString();
 
             }
-            
 
         }else if(hasSuffix) {
 
@@ -542,44 +449,116 @@ function generateLoot() {
 
                 if(suff.type.includes("increased")){
 
-                    //get percentages
-                    let suffPercentage = parseInt(randomNumber(
-                        suff.min,
-                        suff.max
-                    ));
-
-                    loot.defense = increaseByPercentage(loot.defense, suffPercentage);
-
+                    loot.defense = increaseByPercentage(loot.defense, suffModifier);
                     loot.bonus = suff.type + suffPercentage.toString() + "%";
 
                 }else{
 
-                    let suffDef = parseInt(randomNumber(suff.min, suff.max));
-
-                    loot.defense = loot.defense + suffDef;
-
-                    loot.bonus = suff.type + suffDef.toString();
+                    loot.defense = loot.defense + suffModifier;
+                    loot.bonus = suff.type + suffModifier.toString();
 
                 }
 
             }else{
 
-                let value = randomNumber(suff.min, suff.max);
-
-                loot.bonus = suff.type + value.toString();
+                loot.bonus = suff.type + suffModifier.toString();
 
             }
         }
     }
 
-
     // Rare items get multiple bonuses
-    if (rarity === "Rare") {
+    if (rarity === "Rare" && item.type === "Weapon") {
 
-        loot.bonus = [
-            "+15% Attack Speed",
-            "+10 Strength"
-        ];
+        let total = randomNumber(3, 6);
+
+        // Guarantee at least 1 prefix and 1 suffix
+        let prefixCount = randomNumber(
+            1,
+            Math.min(3, total - 1)
+        );
+
+        let suffixCount = total - prefixCount;
+
+        // Maximum of 3 suffixes, move excess to prefixes
+        if (suffixCount > 3) {
+            suffixCount = 3;
+            prefixCount = total - suffixCount;
+        }
+
+        let prefixes = getRandomAffixes(weaponPrefixes, prefixCount);
+        let suffixes = getRandomAffixes(weaponSuffixes, suffixCount);
+
+        // alert(JSON.stringify(prefixes));
+        // alert(JSON.stringify(suffixes));
+        
+        loot.bonus = [];
+        let bonusNo = 0
+
+        loot.name = "Rare " + loot.name;
+
+        prefixes.forEach(pref => {
+
+            let prefWeaponModifier = randomNumber(pref.min, pref.max);
+
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        loot.minDamage = increaseByPercentage(loot.minDamage, prefWeaponModifier);
+                        loot.maxDamage = increaseByPercentage(loot.maxDamage, prefWeaponModifier);
+
+                        loot.bonus[bonusNo] = pref.type + prefWeaponModifier.toString() + "%";
+
+                    }else{
+
+                        loot.minDamage = loot.minDamage + pref.min;
+                        loot.maxDamage = loot.maxDamage + pref.max;
+
+                        loot.bonus[bonusNo] = pref.type + pref.min.toString() + " - " + pref.max.toString();
+
+                    }
+
+                }else{
+
+                    loot.bonus[bonusNo] = pref.type + prefWeaponModifier.toString();
+
+                }
+
+                bonusNo ++;
+        });
+
+        suffixes.forEach(suff => {
+
+            let suffWeaponModifier = randomNumber(suff.min, suff.max);
+
+            if(suff.modifier){
+
+                if(suff.type.includes("increased")){
+
+                    loot.minDamage = increaseByPercentage(loot.minDamage, suffWeaponModifier);
+                    loot.maxDamage = increaseByPercentage(loot.maxDamage, suffWeaponModifier);
+
+                    loot.bonus[bonusNo] = suff.type + suffWeaponModifier.toString() + "%";
+
+                }else{
+
+                    loot.minDamage = loot.minDamage + suff.min;
+                    loot.maxDamage = loot.maxDamage + suff.max;
+
+                    loot.bonus[bonusNo] = suff.type + suff.min.toString() + " - " + suff.max.toString();
+
+                }
+
+            }else{
+
+                loot.bonus[bonusNo] = suff.type + suffWeaponModifier.toString();
+
+            }
+
+            bonusNo ++
+
+        });
 
     }
 
@@ -591,8 +570,49 @@ function generateLoot() {
 
     }
 
+    //alert(JSON.stringify(loot));
 
     return loot;
+}
+
+function getRandomAffixes(affixPool, amount) {
+
+    let available = [...affixPool];
+    let selected = [];
+
+    for (let i = 0; i < amount; i++) {
+
+        if (available.length === 0) {
+            break;
+        }
+
+        let index = randomNumber(
+            0,
+            available.length - 1
+        );
+
+        selected.push(
+            available[index]
+        );
+
+        available.splice(index, 1);
+    }
+
+    return selected;
+}
+
+function addPrefix(loot, prefix){
+
+
+
+
+}
+
+function addSuffix(loot, suffix){
+
+
+
+
 }
 
 
@@ -616,8 +636,9 @@ function displayLoot(loot) {
 
     if (loot.bonus) {
 
-        if (Array.isArray(loot.bonus)) {
+        html += '<p>------------------------</p>'
 
+        if (Array.isArray(loot.bonus)) {
 
             loot.bonus.forEach(bonus => {
                 html += `<p>${bonus}</p>`;

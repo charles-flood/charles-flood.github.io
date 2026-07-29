@@ -9,6 +9,9 @@ body {
     background: #111827;
     color: white;
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
@@ -32,8 +35,7 @@ nav div {
 
 a {
     color: rgb(255, 255, 255);
-    text-decoration: none;
-    
+    text-decoration: none;  
 }
 
 a:hover {
@@ -43,14 +45,15 @@ a:hover {
 main {
     max-width: 1000px;
     margin: auto;
+    flex: 1;
 }
 
 section {
-    padding: 80px 40px;
+    padding: 40px 20px;
 }
 
 .hero {
-    min-height: 500px;
+    padding: 60px 0;
 
     display: flex;
     flex-direction: column;
@@ -59,13 +62,13 @@ section {
 }
 
 .hero h2 {
-    font-size: 48px;
+    font-size: 38px;
     margin-bottom: 10px;
 }
 
 .hero p {
     font-size: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .button {
@@ -75,8 +78,8 @@ section {
 }
 
 .project-card {
-    margin-top: 30px;
-    padding: 30px;
+    margin-top: 20px;
+    padding: 20px;
     border: 1px solid #374151;
     border-radius: 8px;
 }
@@ -90,7 +93,7 @@ section {
 }
 
 footer {
-    padding: 30px;
+    padding: 15px 30px;
     text-align: center;
     border-top: 1px solid #374151;
 }

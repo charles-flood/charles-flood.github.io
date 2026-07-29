@@ -1,22 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Loot</title>
-<link rel="stylesheet" href="loot.css">
+  <head>
+    <meta charset="UTF-8">
+    <title>Loot</title>
+    <link rel="stylesheet" href="loot.css">
 
-</head>
-<body>
+  </head>
+  <body>
 
-<div class="loot-container">
-  <button id="myButton">Gief Loot</button>
+    <nav>
+        <a href="../index.html">Home</a>
 
-  <div id="lootResult"></div>
-</div>
+        <div class="nav-right">
+            <a href="loot.html">Loot Generator</a>
 
-<script src="loot.js"></script>
-<script src="items.js"></script>
-<script src="affixes.js"></script>
+            <div class="dropdown">
+                <button class="dropbtn">Inventory ▼</button>
 
-</body>
+                <div class="dropdown-content">
+                    <a href="#">View Inventory</a>
+                    <a href="#">Clear Inventory</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="loot-container">
+      <button id="myButton">Gief Loot</button>
+
+      <div id="lootResult"></div>
+    </div>
+
+    <script src="loot.js"></script>
+    <script src="items.js"></script>
+    <script src="affixes.js"></script>
+
+  </body>
 </html>

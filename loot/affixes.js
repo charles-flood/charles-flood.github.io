@@ -79,13 +79,6 @@ const weaponSuffixes = [
             modifier: true
         },
         {
-            name: "of Force",
-            type: "Damage increased by ",
-            min: 20,
-            max: 50,
-            modifier: true
-        },
-        {
             name: "of Flame",
             type: "Fire damage ",
             min: 3,
@@ -101,7 +94,7 @@ const weaponSuffixes = [
         },
         {
             name: "of the Ox",
-            type: "Strngth ",
+            type: "Strength ",
             min: 5,
             max: 15,
             modifier: false
