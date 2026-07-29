@@ -323,12 +323,253 @@ function generateLoot() {
         }
 
     // TODO : refactor how affixes are attached
+    /*
+
+        ==============================================================================================================================================================================
+        CLEAN THIS SHIT UP
+        ==============================================================================================================================================================================
+
+    */
 
     }else if(rarity === "Magic" && item.type === "Armor") {
-        //add some armor lootage
-        
+                
+        //roll for prefix/suffix/both
+        let hasPrefix = Math.random() * 100 < prefixChance;
+        let hasSuffix = Math.random() * 100 < suffixChance;
+
+        //item is magic, force at least 1 prefix or suffix if both rolled false
+        if(!hasPrefix && !hasSuffix){
+
+            if (Math.random() < 0.5) {
+                hasPrefix = true;
+            } else {
+                hasSuffix = true;
+            }
+
+        }
+
+        // hasPrefix = true;
+        // hasSuffix = true;
 
 
+        //prefix
+        if(hasPrefix){
+
+            //grab prefix
+            const pref = armorPrefixes[
+            randomNumber(0, armorPrefixes.length - 1)
+            ];
+
+            //update item name
+            loot.name = pref.name + " " + loot.name;
+
+            //attach prefix
+            loot.prefix = pref;
+            
+        }
+
+        //suffix
+        if(hasSuffix){
+
+            //grab suffix
+            const suff = armorSuffixes[
+            randomNumber(0, armorSuffixes.length - 1)
+            ];
+
+            //update item name
+            loot.name = loot.name + " " + suff.name;
+
+            //attach prefix
+            loot.suffix = suff;
+
+        }
+
+
+        //alert(JSON.stringify(loot));
+
+        //add bonuses to item and adjust dmg if needed
+        if(hasPrefix && hasSuffix){
+
+            let pref = loot.prefix;
+            let suff = loot.suffix;
+
+
+            // cater for identical types first
+            if(pref.type == suff.type){
+
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        //get percentages
+                        let prefPercentage = parseInt(randomNumber(
+                            pref.min,
+                            pref.max
+                        ));
+                        let suffPercentage = parseInt(randomNumber(
+                            suff.min,
+                            suff.max
+                        ));
+
+                        let fullPercentage = prefPercentage + suffPercentage;
+
+
+                        loot.defense = increaseByPercentage(loot.defense, fullPercentage);
+                        
+
+                        loot.bonus = pref.type + fullPercentage.toString() + "%";
+
+                    }else{
+
+                        let prefDef = parseInt(randomNumber(pref.min, pref.max));
+                        let suffDef = parseInt(randomNumber(suff.min, suff.max));
+
+                        loot.defense = loot.defense + prefDef + suffDef;
+
+                        loot.bonus = pref.type + (prefDef + suffDef).toString();
+
+                    }
+                }
+
+            }else{
+
+                loot.bonus = [];
+
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        //get percentages
+                        let prefPercentage = parseInt(randomNumber(
+                            pref.min,
+                            pref.max
+                        ));
+
+                        loot.defense = increaseByPercentage(loot.defense, prefPercentage);
+                        
+                        loot.bonus[0] = pref.type + prefPercentage.toString() + "%";
+
+                    }else{
+
+                        let prefDef = parseInt(randomNumber(pref.min, pref.max));
+
+                        loot.bonus[0] = pref.type + prefDef.toString();
+
+                    }
+
+                }else{
+
+                    let value = randomNumber(pref.min, pref.max);
+
+                    loot.bonus[0] = pref.type + value.toString();
+
+                }
+
+                if(suff.modifier){
+
+                    if(suff.type.includes("increased")){
+
+                        //get percentages
+                        let suffPercentage = parseInt(randomNumber(
+                            suff.min,
+                            suff.max
+                        ));
+
+                        loot.defense = increaseByPercentage(loot.defense, suffPercentage);
+
+                        loot.bonus[1] = suff.type + suffPercentage.toString() + "%";
+
+                    }else{
+                        
+                        let suffDef = parseInt(randomNumber(suff.min, suff.max));
+
+                        loot.defense = loot.defense + suffDef;
+
+                        loot.bonus[1] = suff.type + suffDef.toString();
+
+                    }
+
+                }else{
+
+                    let value = randomNumber(suff.min, suff.max);
+
+                    loot.bonus[1] = suff.type + value.toString();
+
+                }
+            }
+        }else if(hasPrefix) {
+
+            let pref = loot.prefix;
+
+            if(pref.modifier){
+
+                if(pref.type.includes("increased")){
+
+                    //get percentages
+                    let prefPercentage = parseInt(randomNumber(
+                        pref.min,
+                        pref.max
+                    ));
+
+                    loot.defense = increaseByPercentage(loot.defense, prefPercentage);
+
+                    loot.bonus = pref.type + prefPercentage.toString() + "%";
+
+                }else{
+
+                    let prefDef = parseInt(randomNumber(pref.min, pref.max));
+
+                    loot.defense = loot.defense + prefDef;
+
+                    loot.bonus = pref.type + prefDef.toString();
+
+                }
+
+            }else{
+
+                let value = randomNumber(pref.min, pref.max);
+
+                loot.bonus = pref.type + value.toString();
+
+            }
+            
+
+        }else if(hasSuffix) {
+
+            let suff = loot.suffix;
+
+            if(suff.modifier){
+
+                if(suff.type.includes("increased")){
+
+                    //get percentages
+                    let suffPercentage = parseInt(randomNumber(
+                        suff.min,
+                        suff.max
+                    ));
+
+                    loot.defense = increaseByPercentage(loot.defense, suffPercentage);
+
+                    loot.bonus = suff.type + suffPercentage.toString() + "%";
+
+                }else{
+
+                    let suffDef = parseInt(randomNumber(suff.min, suff.max));
+
+                    loot.defense = loot.defense + suffDef;
+
+                    loot.bonus = suff.type + suffDef.toString();
+
+                }
+
+            }else{
+
+                let value = randomNumber(suff.min, suff.max);
+
+                loot.bonus = suff.type + value.toString();
+
+            }
+        }
     }
 
 
