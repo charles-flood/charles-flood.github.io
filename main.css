@@ -31,8 +31,9 @@ nav div {
 }
 
 a {
-    color: white;
+    color: rgb(255, 255, 255);
     text-decoration: none;
+    
 }
 
 a:hover {
@@ -92,4 +93,8 @@ footer {
     padding: 30px;
     text-align: center;
     border-top: 1px solid #374151;
+}
+
+.project-links {
+    color: rgb(28, 208, 58);
 }
