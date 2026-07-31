@@ -467,12 +467,14 @@ function generateLoot() {
         }
     }
 
+    //TODO affix ids been introduced updates required to use
+
     // Rare items get multiple bonuses
     if (rarity === "Rare" && item.type === "Weapon") {
 
         let total = randomNumber(3, 6);
 
-        // Guarantee at least 1 prefix and 1 suffix
+        // Guarantee at least 1 suffix or prefix
         let prefixCount = randomNumber(
             1,
             Math.min(3, total - 1)
@@ -488,9 +490,6 @@ function generateLoot() {
 
         let prefixes = getRandomAffixes(weaponPrefixes, prefixCount);
         let suffixes = getRandomAffixes(weaponSuffixes, suffixCount);
-
-        // alert(JSON.stringify(prefixes));
-        // alert(JSON.stringify(suffixes));
         
         loot.bonus = [];
         let bonusNo = 0
@@ -560,6 +559,91 @@ function generateLoot() {
 
         });
 
+    }else if (rarity === "Rare" && item.type === "Armor") {
+
+        let total = randomNumber(3, 6);
+
+        // Guarantee at least 1 suffix or prefix
+        let prefixCount = randomNumber(
+            1,
+            Math.min(3, total - 1)
+        );
+
+        let suffixCount = total - prefixCount;
+
+        // Maximum of 3 suffixes, move excess to prefixes
+        if (suffixCount > 3) {
+            suffixCount = 3;
+            prefixCount = total - suffixCount;
+        }
+
+        let prefixes = getRandomAffixes(armorPrefixes, prefixCount);
+        let suffixes = getRandomAffixes(armorSuffixes, suffixCount);
+        
+        loot.bonus = [];
+        let bonusNo = 0
+
+        loot.name = "Rare " + loot.name;
+
+        prefixes.forEach(pref => {
+
+            let prefArmorModifier = randomNumber(pref.min, pref.max);
+
+                if(pref.modifier){
+
+                    if(pref.type.includes("increased")){
+
+                        loot.defense = increaseByPercentage(loot.defense, prefArmorModifier);
+
+                        loot.bonus[bonusNo] = pref.type + prefArmorModifier.toString() + "%";
+
+                    }else{
+
+                        loot.defense = loot.defense + prefArmorModifier;
+
+                        loot.bonus[bonusNo] = pref.type + prefArmorModifier.toString();
+
+                    }
+
+                }else{
+
+                    loot.bonus[bonusNo] = pref.type + prefArmorModifier.toString();
+
+                }
+
+                bonusNo ++;
+        });
+
+        suffixes.forEach(suff => {
+
+            let suffArmorModifier = randomNumber(suff.min, suff.max);
+
+            if(suff.modifier){
+
+                if(suff.type.includes("increased")){
+
+                    loot.defense = increaseByPercentage(loot.defense, suffArmorModifier);
+
+                    loot.bonus[bonusNo] = suff.type + suffArmorModifier.toString() + "%";
+
+                }else{
+
+                    loot.defense = loot.defense + suffArmorModifier;
+
+                    loot.bonus[bonusNo] = suff.type + suffArmorModifier.toString();
+
+                }
+
+            }else{
+
+                loot.bonus[bonusNo] = suff.type + suffArmorModifier.toString();
+
+            }
+
+            bonusNo ++
+
+        });
+
     }
 
 
@@ -597,6 +681,8 @@ function getRandomAffixes(affixPool, amount) {
 
         available.splice(index, 1);
     }
+
+    selected.sort((a, b) => a.id - b.id);
 
     return selected;
 }
@@ -664,4 +750,31 @@ document.getElementById('myButton').addEventListener('click', () => {
 
     displayLoot(loot);
 
+    moveButton();
+
 });
+
+function moveButton() {
+
+    const button = document.getElementById("myButton");
+
+    const padding = 20;
+
+    const maxX = window.innerWidth - button.offsetWidth - padding;
+    const maxY = window.innerHeight - button.offsetHeight - padding;
+
+    const x = randomNumber(padding, maxX);
+    const y = randomNumber(padding, maxY);
+
+    button.style.left = `${x}px`;
+    button.style.top = `${y}px`;
+
+    // Restart animation
+    button.classList.remove("phase-in");
+
+    // Force reflow so the animation can restart
+    void button.offsetWidth;
+
+    button.classList.add("phase-in"); 
+
+}
