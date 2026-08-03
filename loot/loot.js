@@ -4,15 +4,15 @@
 const rarities = [
         {
             name: "Common",
-            chance: 10
+            chance: 1
         },
         {
             name: "Magic",
-            chance: 10
+            chance: 50
         },
         {
             name: "Rare",
-            chance: 90
+            chance: 50
         }
 ];
 
@@ -490,6 +490,10 @@ function generateLoot() {
 
         let prefixes = getRandomAffixes(weaponPrefixes, prefixCount);
         let suffixes = getRandomAffixes(weaponSuffixes, suffixCount);
+
+        loot.prefix = prefixes;
+        loot.suffix = suffixes;
+    
         
         loot.bonus = [];
         let bonusNo = 0
@@ -580,6 +584,9 @@ function generateLoot() {
         let prefixes = getRandomAffixes(armorPrefixes, prefixCount);
         let suffixes = getRandomAffixes(armorSuffixes, suffixCount);
         
+        loot.prefix = prefixes;
+        loot.suffix = suffixes;
+
         loot.bonus = [];
         let bonusNo = 0
 
@@ -654,8 +661,6 @@ function generateLoot() {
 
     }
 
-    //alert(JSON.stringify(loot));
-
     return loot;
 }
 
@@ -675,11 +680,15 @@ function getRandomAffixes(affixPool, amount) {
             available.length - 1
         );
 
-        selected.push(
-            available[index]
-        );
+        let chosen = available[index];
+        
+        selected.push(chosen);
 
-        available.splice(index, 1);
+        //TODO REFINE TYPES!!!!
+        //only 1 of each type can be chosen
+        available = available.filter(
+            affix => affix.type !== chosen.type
+        );
     }
 
     selected.sort((a, b) => a.id - b.id);
@@ -700,6 +709,77 @@ function addSuffix(loot, suffix){
 
 
 }
+
+// function processAffixes(loot, affixes) {
+
+//     affixes.forEach(affix => {
+
+//         let value = randomNumber(
+//             affix.min,
+//             affix.max
+//         );
+
+//         // Apply modifier to the item
+//         if (affix.modifier) {
+
+//             if (affix.type.includes("increased")) {
+
+//                 if (loot.minDamage !== undefined) {
+
+//                     loot.minDamage = increaseByPercentage(
+//                         loot.minDamage,
+//                         value
+//                     );
+
+//                     loot.maxDamage = increaseByPercentage(
+//                         loot.maxDamage,
+//                         value
+//                     );
+
+//                 } else if (loot.defense !== undefined) {
+
+//                     loot.defense = increaseByPercentage(
+//                         loot.defense,
+//                         value
+//                     );
+
+//                 }
+
+//             } else {
+
+//                 if (loot.minDamage !== undefined) {
+
+//                     loot.minDamage += value;
+//                     loot.maxDamage += value;
+
+//                 } else if (loot.defense !== undefined) {
+
+//                     loot.defense += value;
+
+//                 }
+//             }
+//         }
+
+//         // Combine duplicate bonus types
+//         let existingBonus = loot.bonus.find(
+//             bonus => bonus.type === affix.type
+//         );
+
+//         if (existingBonus) {
+
+//             existingBonus.value += value;
+
+//         } else {
+
+//             loot.bonus.push({
+//                 type: affix.type,
+//                 value: value
+//             });
+
+//         }
+
+//     });
+// }
 
 
 // Display the loot
