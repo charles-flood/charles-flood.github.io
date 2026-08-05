@@ -17,6 +17,19 @@ body {
   flex-direction: column;
   background: #10b140;
   font-family: sans-serif;
+
+  background-image:
+        radial-gradient(#0b8f32 1px, transparent 1px),
+        radial-gradient(#5edc63 1px, transparent 2px);
+
+    background-size:
+        12px 12px,
+        18px 18px;
+
+    background-position:
+        0 0,
+        6px 6px;
+
 }
 
 nav {
