@@ -19,16 +19,16 @@ body {
   font-family: sans-serif;
 
   background-image:
-        radial-gradient(#0b8f32 1px, transparent 1px),
-        radial-gradient(#5edc63 1px, transparent 2px);
+    radial-gradient(#0b8f32 1px, transparent 1px),
+    radial-gradient(#5edc63 1px, transparent 2px);
 
-    background-size:
-        12px 12px,
-        18px 18px;
+  background-size:
+    12px 12px,
+    18px 18px;
 
-    background-position:
-        0 0,
-        6px 6px;
+  background-position:
+    0 0,
+    6px 6px;
 
 }
 
@@ -60,12 +60,12 @@ nav a:hover {
   align-items: center;
   padding-right: 100px;
   gap: 20px;
-} 
+}
 
 .dropdown {
-    position: relative;
-    display: flex;
-    align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .dropbtn {
@@ -78,15 +78,15 @@ nav a:hover {
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
 
-    background: #1f2937;
-    border: 1px solid #374151;
-    min-width: 180px;
-    z-index: 1000;
+  background: #1f2937;
+  border: 1px solid #374151;
+  min-width: 180px;
+  z-index: 1000;
 }
 
 .dropdown-content a {
@@ -110,15 +110,15 @@ nav a:hover {
 }
 
 button {
-    position: fixed;
+  position: fixed;
 
-    padding: 16px 32px;
-    font-size: 18px;
-    border: 1px solid black;
-    border-radius: 8px;
-    background: #4f46e5;
-    color: white;
-    cursor: pointer;
+  padding: 16px 32px;
+  font-size: 18px;
+  border: 1px solid black;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
 }
 
 button:hover {
@@ -134,16 +134,15 @@ button:active {
 }
 
 button.phase-in {
-    animation: phaseIn 1s ease;
+  animation: phaseIn 1s ease;
 }
 
 @keyframes phaseIn {
-    from {
-        opacity: 0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1;
-    }
+  to {
+    opacity: 1;
+  }
 }
-  
