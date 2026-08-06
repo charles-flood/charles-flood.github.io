@@ -2,9 +2,6 @@ name: Update Jira Tickets
 
 on:
 
-  schedule:
-    - cron: "15 */4 * * *"
-  
   workflow_dispatch:
 
   permissions:
