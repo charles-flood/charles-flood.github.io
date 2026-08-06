@@ -1,14 +1,18 @@
 fetch("data/tickets.json")
 .then(response => response.json())
-.then(tickets => {
+.then(data => {
 
+    document.getElementById("last-updated").textContent =
+        "Last updated: " +
+        new Date(data.lastUpdated).toLocaleString();
+
+    const tickets = data.tickets;
 
     const columns = {
         "To Do": document.getElementById("todo"),
         "In Progress": document.getElementById("progress"),
         "Done": document.getElementById("done")
     };
-
 
     tickets.forEach(ticket => {
 
@@ -17,9 +21,7 @@ fetch("data/tickets.json")
 
                 <strong>${ticket.id}</strong>
 
-                <p>
-                    ${ticket.title}
-                </p>
+                <p>${ticket.title}</p>
 
                 <small>
                     Priority: ${ticket.priority}
@@ -28,19 +30,23 @@ fetch("data/tickets.json")
             </div>
         `;
 
-
-        if(columns[ticket.status]) {
+        if (columns[ticket.status]) {
 
             columns[ticket.status].innerHTML += card;
 
-        }
-        else {
+        } else {
 
             console.log(
                 "Unknown Jira status:",
                 ticket.status
             );
-            
+
         }
     });
+
+})
+.catch(error => {
+
+    console.error(error);
+
 });

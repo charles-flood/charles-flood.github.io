@@ -1,8 +1,14 @@
 name: Update Jira Tickets
 
 on:
+
+  schedule:
+    - cron: "15 */4 * * *"
   
   workflow_dispatch:
+
+  permissions:
+  contents: write
 
 jobs:
 
@@ -39,6 +45,11 @@ jobs:
 
         git add mini-engine/data/tickets.json
 
-        git commit -m "Update Jira tickets" || exit 0
+        if git diff --cached --quiet; then
+          echo "No ticket changes"
+          exit 0
+        fi
+
+        git commit -m "Update Jira tickets"
 
         git push

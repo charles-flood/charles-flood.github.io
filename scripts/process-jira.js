@@ -17,8 +17,12 @@ const tickets = jiraData.issues.map(issue => {
 
 });
 
+const output = {
+    lastUpdated: new Date().toISOString(),
+    tickets: tickets
+};
 
 fs.writeFileSync(
     "mini-engine/data/tickets.json",
-    JSON.stringify(tickets, null, 2)
+    JSON.stringify(output, null, 2)
 );
