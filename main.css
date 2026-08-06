@@ -30,7 +30,7 @@ nav {
 
 nav div {
     display: flex;
-    gap: 20px;
+    gap: 10px;
 }
 
 a {
