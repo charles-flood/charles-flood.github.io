@@ -2,10 +2,12 @@ name: Update Jira Tickets
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "15 * * * *"
 
   workflow_dispatch:
 
+permissions:
+  contents: write
 
 jobs:
 
@@ -17,6 +19,8 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+    persist-credentials: true
 
 
     - name: Get Jira tickets
