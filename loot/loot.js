@@ -787,10 +787,25 @@ function displayLoot(loot) {
 
     const result = document.getElementById("lootResult");
 
-    let html = `
-        <h2>${loot.name}</h2>
-        <p>Type: ${loot.type}</p>
-    `;
+    let html = ``;
+
+    if (loot.name.includes("Rare")){
+        html += `
+            <h2 class=rare-loot>${loot.name}</h2>
+            <p>Type: ${loot.type}</p>
+        `;
+    }else if(loot.bonus) {
+        html += `
+            <h2 class=magic-loot>${loot.name}</h2>
+            <p>Type: ${loot.type}</p>
+        `;
+    }else{
+        html += `
+            <h2>${loot.name}</h2>
+            <p>Type: ${loot.type}</p>
+        `;
+
+    }
 
     if (loot.minDamage) {
         html += `<p>Damage: ${loot.minDamage} - ${loot.maxDamage}</p>`;
@@ -807,14 +822,14 @@ function displayLoot(loot) {
         if (Array.isArray(loot.bonus)) {
 
             loot.bonus.forEach(bonus => {
-                html += `<p>${bonus}</p>`;
+                html += `<p class=loot-bonus>${bonus}</p>`;
             });
 
             html += `</ul>`;
 
         } else {
 
-            html += `<p>${loot.bonus}</p>`;
+            html += `<p class=loot-bonus>${loot.bonus}</p>`;
 
         }
     }

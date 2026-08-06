@@ -130,7 +130,27 @@ button:active {
 }
 
 #lootResult {
+    background-color: #2b2b2b;
+    color: rgb(219, 212, 212);
+    padding: 15px 25px;
+    border-radius: 8px;
+    border: 2px solid #8c9493;
+    width: fit-content;
     text-align: center;
+}
+
+.loot-bonus{
+    color: #736ece;
+}
+
+.rare-loot{
+    color: #e4d656;
+    padding: 5px;
+}
+
+.magic-loot{
+    color: #4f46e5;
+    padding: 5px;
 }
 
 button.phase-in {
