@@ -63,14 +63,11 @@ section {
 }
 
 
-
 .links {
     margin-top: 30px;
     display: flex;
     gap: 20px;
 }
-
-
 
 .button {
     border: 1px solid white;
@@ -80,25 +77,16 @@ section {
     text-decoration: none;
 }
 
-
-
 .button:hover {
     background: white;
     color: #111827;
 }
-
-
-
-/* Info cards */
-
 
 .cards {
     display: flex;
     gap: 20px;
     margin-top: 20px;
 }
-
-
 
 .card {
     flex: 1;
@@ -107,18 +95,13 @@ section {
     border-radius: 8px;
 }
 
-
-
 /* Jira board */
-
 
 .board {
     display: flex;
     gap: 20px;
     margin-top: 25px;
 }
-
-
 
 .column {
     flex: 1;
@@ -128,13 +111,9 @@ section {
     padding: 20px;
 }
 
-
-
 .column h3 {
     margin-bottom: 20px;
 }
-
-
 
 .ticket {
     background: #111827;
@@ -144,15 +123,9 @@ section {
     border-radius: 6px;
 }
 
-
-
 .ticket.active {
-
     border-left: 5px solid orange;
-
 }
-
-
 
 .ticket.complete {
 
@@ -160,14 +133,8 @@ section {
 
 }
 
-
-
 footer {
-
     border-top: 1px solid #374151;
-
     text-align: center;
-
     padding: 20px;
-
 }

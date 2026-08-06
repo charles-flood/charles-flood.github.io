@@ -1,0 +1,47 @@
+name: Update Jira Tickets
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+
+  workflow_dispatch:
+
+
+jobs:
+
+  update-tickets:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+
+    - name: Get Jira tickets
+      run: |
+
+        curl \
+        -u "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_TOKEN }}" \
+        "${{ secrets.JIRA_URL }}/rest/api/3/search/jql?jql=project=SCRUM&fields=summary,status,priority" \
+        -o jira-response.json
+
+
+    - name: Convert Jira data
+      run: |
+
+        node scripts/process-jira.js
+
+
+    - name: Commit updates
+      run: |
+
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+
+        git add data/tickets.json
+
+        git commit -m "Update Jira tickets" || exit 0
+
+        git push
