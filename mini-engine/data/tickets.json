@@ -1,0 +1,26 @@
+[
+  {
+    "id": "SCRUM-4",
+    "title": "Create rudimentary ui landing page",
+    "status": "To Do",
+    "priority": "Medium"
+  },
+  {
+    "id": "SCRUM-3",
+    "title": "Create rudimentary scan class",
+    "status": "To Do",
+    "priority": "Medium"
+  },
+  {
+    "id": "SCRUM-2",
+    "title": "Create rudimentary DAL class",
+    "status": "In Progress",
+    "priority": "Medium"
+  },
+  {
+    "id": "SCRUM-1",
+    "title": "Create rudimentary connection class",
+    "status": "To Do",
+    "priority": "Medium"
+  }
+]
