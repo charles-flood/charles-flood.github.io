@@ -19,6 +19,6 @@ const tickets = jiraData.issues.map(issue => {
 
 
 fs.writeFileSync(
-    "data/tickets.json",
+    "mini-engine/data/tickets.json",
     JSON.stringify(tickets, null, 2)
 );
