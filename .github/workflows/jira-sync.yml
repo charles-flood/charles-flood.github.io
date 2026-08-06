@@ -6,9 +6,6 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
 
   update-tickets:
@@ -20,7 +17,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-    persist-credentials: true
 
 
     - name: Get Jira tickets
