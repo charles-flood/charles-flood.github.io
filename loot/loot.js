@@ -65,7 +65,6 @@ function generateLoot() {
         rarity: rarity
     };
 
-
     // add base stats to item
     if (item.type === "Weapon") {
 
@@ -568,10 +567,7 @@ function generateLoot() {
         let total = randomNumber(3, 6);
 
         // Guarantee at least 1 suffix or prefix
-        let prefixCount = randomNumber(
-            1,
-            Math.min(3, total - 1)
-        );
+        let prefixCount = randomNumber(1, Math.min(3, total - 1));
 
         let suffixCount = total - prefixCount;
 
@@ -652,15 +648,6 @@ function generateLoot() {
         });
 
     }
-
-
-    // Unique items get a special property
-    if (rarity === "Unique") {
-
-        loot.bonus = "+25% Fire Damage";
-
-    }
-
     return loot;
 }
 
@@ -681,7 +668,6 @@ function getRandomAffixes(affixPool, amount) {
         );
 
         let chosen = available[index];
-        
         selected.push(chosen);
 
         //TODO REFINE TYPES!!!!
