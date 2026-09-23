@@ -1,6 +1,12 @@
 {
-  "lastUpdated": "2026-09-23T11:28:33.302Z",
+  "lastUpdated": "2026-09-23T16:51:57.008Z",
   "tickets": [
+    {
+      "id": "MINENG-6",
+      "title": "Build out prototype (spike)",
+      "status": "To Do",
+      "priority": "Highest"
+    },
     {
       "id": "MINENG-5",
       "title": "Create scan configuration",
