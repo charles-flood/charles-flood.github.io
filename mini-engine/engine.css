@@ -30,6 +30,7 @@ nav {
 nav a {
     color: white;
     text-decoration: none;
+    font-size: 20px;
 }
 
 nav a:hover {
@@ -53,13 +54,12 @@ section {
 }
 
 .hero h1 {
-    font-size: 52px;
+    font-size: 36px;
     margin-bottom: 15px;
 }
 
 .hero p {
     max-width: 700px;
-    font-size: 20px;
 }
 
 
@@ -137,4 +137,46 @@ footer {
     border-top: 1px solid #374151;
     text-align: center;
     padding: 20px;
+}
+
+
+/* Mobile layout */
+@media (max-width: 700px) {
+
+    nav {
+        padding: 15px 20px;
+    }
+
+    section {
+        padding: 30px 15px;
+    }
+
+    Hero
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    /* Stack feature/project cards */
+    .cards {
+        flex-direction: column;
+    }
+
+    /* Stack Jira columns */
+    .board {
+        flex-direction: column;
+    }
+
+    .card,
+    .column {
+        width: 100%;
+    }
+
+    /* Make repository button easier to use */
+    .links {
+        flex-direction: column;
+    }
+
+    .button {
+        text-align: center;
+    }
 }
