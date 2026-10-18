@@ -101,3 +101,7 @@ footer {
 .project-links {
     color: rgb(28, 208, 58);
 }
+
+p {
+    margin-bottom: 20px;
+}
