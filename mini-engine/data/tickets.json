@@ -1,10 +1,28 @@
 {
-  "lastUpdated": "2026-09-24T11:39:16.886Z",
+  "lastUpdated": "2026-10-18T15:47:53.052Z",
   "tickets": [
+    {
+      "id": "MINENG-9",
+      "title": "Build out dal to store result",
+      "status": "To Do",
+      "priority": "Medium"
+    },
+    {
+      "id": "MINENG-8",
+      "title": "Build out engine class to execute",
+      "status": "To Do",
+      "priority": "Medium"
+    },
+    {
+      "id": "MINENG-7",
+      "title": "Decide on command",
+      "status": "To Do",
+      "priority": "Medium"
+    },
     {
       "id": "MINENG-6",
       "title": "Build out prototype (spike)",
-      "status": "To Do",
+      "status": "In Progress",
       "priority": "Highest"
     },
     {
