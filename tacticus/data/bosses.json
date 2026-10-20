@@ -1,0 +1,1 @@
+[{"id":"screamer-killer","name":"Screamer-Killer","short":"SK","team":"enemy","type":"boss","position":{"q":6,"r":2},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":1,"activeLevel":1,"passiveLevel":1},"traits":["boss"],"notes":"Set raid difficulty and observed stats manually. Boss mechanics not yet modelled."}]
