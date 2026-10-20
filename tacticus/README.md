@@ -21,3 +21,11 @@ For local testing, run `python3 -m http.server 8000` from the repository root, t
 **This is a scaffold, not a verified Tacticus combat simulator yet.** The armour calculation is a *placeholder approximation*, not a claim about Tacticus mechanics. Attack range, elevations, movement rules, crits, blocks, ability effects, triggered attacks, adds, summons and boss AI are not simulated. Flat bonus is simply added per hit. Initial health/damage/armour values are intentionally zero until entered by the user. The simulator does not automatically persist every change: click **Save locally** or **Export JSON**.
 
 Next milestone: add verified damage mechanics and data-driven active/passive rules with regression cases from battle footage.
+
+
+## Milestone 1.1: taller board and boss footprints
+
+- Default board is 9 columns × 11 rows. Old saved 9 × 6 boards are expanded on load without losing existing tile elevations or unit stats. Save locally again to persist the expansion.
+- Bosses can occupy multiple hexes; every occupied hex blocks ally placement and is clickable to select the boss.
+- Select Screamer-Killer in the Inspector to edit its footprint as a JSON array of **axial coordinate offsets** relative to its anchor. Include `{ "q": 0, "r": 0 }`. The initial three-hex footprint is an illustration, not verified game geometry.
+- Multi-hex adjacency/range rules are not yet enforced by the provisional combat model.
