@@ -1,4 +1,4 @@
-# Tacticus Raid Lab — Milestone 1
+# Tacticus Raid Lab — Milestone 1.2
 
 Static, dependency-free prototype for GitHub Pages. Initial boss: Screamer-Killer. Initial team: Trajann Valoris, Kariyan Helsates, Laviscus, Boss Gulgortz and Vitruvius.
 
@@ -29,3 +29,7 @@ Next milestone: add verified damage mechanics and data-driven active/passive rul
 - Bosses can occupy multiple hexes; every occupied hex blocks ally placement and is clickable to select the boss.
 - Select Screamer-Killer in the Inspector to edit its footprint as a JSON array of **axial coordinate offsets** relative to its anchor. Include `{ "q": 0, "r": 0 }`. The initial three-hex footprint is an illustration, not verified game geometry.
 - Multi-hex adjacency/range rules are not yet enforced by the provisional combat model.
+
+## 1.2 display fix
+
+The board now displays all 11 rows without a 640px height cap, with horizontal scrolling on narrow screens. The Screamer-Killer footprint is three illustrative hexes by default. The HTML uses cache-busting query strings for the updated CSS and JS. Existing browser saves are migrated; if you previously saved a one-hex footprint, select Screamer-Killer and edit the Boss footprint field to `[ {"q":0,"r":0}, {"q":1,"r":0}, {"q":0,"r":1} ]`.
