@@ -1,7 +1,92 @@
 [
- {"id":"trajann","name":"Trajann Valoris","short":"TV","team":"ally","position":{"q":1,"r":2},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":50,"activeLevel":1,"passiveLevel":1},"notes":"Enter actual build stats; ability effects not yet implemented."},
- {"id":"kariyan","name":"Kariyan Helsates","short":"KH","team":"ally","position":{"q":2,"r":1},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":50,"activeLevel":1,"passiveLevel":1},"notes":""},
- {"id":"laviscus","name":"Laviscus","short":"LA","team":"ally","position":{"q":1,"r":3},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":50,"activeLevel":1,"passiveLevel":1},"notes":""},
- {"id":"gulgortz","name":"Boss Gulgortz","short":"BG","team":"ally","position":{"q":2,"r":4},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":50,"activeLevel":1,"passiveLevel":1},"notes":""},
- {"id":"vitruvius","name":"Vitruvius","short":"VI","team":"ally","position":{"q":2,"r":3},"stats":{"health":0,"armour":0,"damage":0,"hits":1,"pierce":0,"xpLevel":50,"activeLevel":1,"passiveLevel":1},"notes":""}
+    {
+        "id": "trajann",
+        "name": "Trajann Valoris",
+        "short": "TV",
+        "team": "ally",
+        "position": { "q": 1, "r": 2 },
+        "stats": {
+            "health": 0,
+            "armour": 0,
+            "damage": 0,
+            "hits": 1,
+            "pierce": 0,
+            "xpLevel": 50,
+            "activeLevel": 1,
+            "passiveLevel": 1
+        },
+        "notes": "Enter actual build stats; ability effects not yet implemented."
+    },
+    {
+        "id": "kariyan",
+        "name": "Kariyan Helsates",
+        "short": "KH",
+        "team": "ally",
+        "position": { "q": 2, "r": 1 },
+        "stats": {
+            "health": 0,
+            "armour": 0,
+            "damage": 0,
+            "hits": 1,
+            "pierce": 0,
+            "xpLevel": 50,
+            "activeLevel": 1,
+            "passiveLevel": 1
+        },
+        "notes": ""
+    },
+    {
+        "id": "laviscus",
+        "name": "Laviscus",
+        "short": "LA",
+        "team": "ally",
+        "position": { "q": 1, "r": 3 },
+        "stats": {
+            "health": 0,
+            "armour": 0,
+            "damage": 0,
+            "hits": 1,
+            "pierce": 0,
+            "xpLevel": 50,
+            "activeLevel": 1,
+            "passiveLevel": 1
+        },
+        "notes": ""
+    },
+    {
+        "id": "gulgortz",
+        "name": "Boss Gulgortz",
+        "short": "BG",
+        "team": "ally",
+        "position": { "q": 2, "r": 4 },
+        "stats": {
+            "health": 0,
+            "armour": 0,
+            "damage": 0,
+            "hits": 1,
+            "pierce": 0,
+            "xpLevel": 50,
+            "activeLevel": 1,
+            "passiveLevel": 1
+        },
+        "notes": ""
+    },
+    {
+        "id": "vitruvius",
+        "name": "Vitruvius",
+        "short": "VI",
+        "team": "ally",
+        "position": { "q": 2, "r": 3 },
+        "stats": {
+            "health": 0,
+            "armour": 0,
+            "damage": 0,
+            "hits": 1,
+            "pierce": 0,
+            "xpLevel": 50,
+            "activeLevel": 1,
+            "passiveLevel": 1
+        },
+        "notes": ""
+    }
 ]
