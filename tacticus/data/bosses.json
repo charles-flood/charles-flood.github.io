@@ -5,10 +5,7 @@
         "short": "SK",
         "team": "enemy",
         "type": "boss",
-        "position": {
-            "q": 6,
-            "r": 2
-        },
+        "position": { "q": 6, "r": 2 },
         "stats": {
             "health": 0,
             "armour": 0,
@@ -19,23 +16,7 @@
             "activeLevel": 1,
             "passiveLevel": 1
         },
-        "traits": [
-            "boss"
-        ],
-        "notes": "Set raid difficulty and observed stats manually. Boss mechanics not yet modelled. Three-hex footprint is illustrative and editable, not a verified Screamer-Killer shape.",
-        "footprint": [
-            {
-                "q": 0,
-                "r": 0
-            },
-            {
-                "q": 1,
-                "r": 0
-            },
-            {
-                "q": 0,
-                "r": 1
-            }
-        ]
+        "traits": ["boss"],
+        "notes": "Set raid difficulty and observed stats manually. Boss mechanics not yet modelled."
     }
 ]
