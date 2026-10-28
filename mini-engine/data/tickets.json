@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-10-28T12:43:33.553Z",
+  "lastUpdated": "2026-10-28T22:30:17.293Z",
   "tickets": [
     {
       "id": "MINENG-9",
@@ -34,7 +34,7 @@
     {
       "id": "MINENG-4",
       "title": "Create rudimentary ui landing page",
-      "status": "In Progress",
+      "status": "To Do",
       "priority": "Medium"
     },
     {
@@ -46,7 +46,7 @@
     {
       "id": "MINENG-2",
       "title": "Create rudimentary DAL class",
-      "status": "In Progress",
+      "status": "To Do",
       "priority": "Medium"
     },
     {
