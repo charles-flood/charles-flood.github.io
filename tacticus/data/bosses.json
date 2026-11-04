@@ -10,19 +10,22 @@
             "r": 2
         },
         "stats": {
-            "health": 0,
-            "armour": 0,
-            "damage": 0,
-            "hits": 1,
-            "pierce": 0,
+            "health": 30000000,
+            "armour": 3326,
+            "damage": 2764,
+            "hits": 5,
+            "pierce": 1,
             "xpLevel": 1,
             "activeLevel": 1,
             "passiveLevel": 1
         },
         "traits": [
-            "boss"
+            "Immune",
+            "Big Target",
+            "Instinctive Behaviour",
+            "Suppressive Fire"
         ],
-        "notes": "Set raid difficulty and observed stats manually. Boss mechanics not yet modelled. Three-hex footprint is illustrative and editable, not a verified Screamer-Killer shape.",
+        "notes": "Mythic 1 wiki reference. Attack inspector defaults to melee (5 Physical hits); ranged is 4 Plasma hits. Boss footprint remains illustrative.",
         "footprint": [
             {
                 "q": 0,
@@ -36,6 +39,21 @@
                 "q": 0,
                 "r": 1
             }
-        ]
+        ],
+        "difficulty": "Mythic 1",
+        "attacks": {
+            "melee": {
+                "damageType": "Physical",
+                "hits": 5,
+                "pierce": 1
+            },
+            "ranged": {
+                "damageType": "Plasma",
+                "hits": 4,
+                "range": 2,
+                "pierce": null
+            }
+        },
+        "source": "https://tacticus.wiki.gg/wiki/Screamer-Killer"
     }
 ]

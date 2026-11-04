@@ -1,0 +1,53 @@
+{
+    "id": "screamer-killer-1a",
+    "name": "Screamer-Killer — Map 1a",
+    "bossId": "screamerKiller",
+    "difficulty": "M1",
+    "coordinateSystem": "axial",
+    "verified": false,
+
+    "tiles": [
+        {
+            "q": 3,
+            "r": 0,
+            "elevation": 0,
+            "terrain": "normal"
+        },
+        {
+            "q": 4,
+            "r": 0,
+            "elevation": 0,
+            "terrain": "normal"
+        },
+        {
+            "q": 3,
+            "r": 1,
+            "elevation": 1,
+            "terrain": "high-ground"
+        }
+    ],
+
+    "boss": {
+        "position": {
+            "q": 3,
+            "r": 0
+        },
+        "footprint": [
+            { "q": 0, "r": 0 },
+            { "q": 1, "r": 0 },
+            { "q": 0, "r": 1 }
+        ],
+        "stationary": true,
+        "canAttack": false
+    },
+
+    "deploymentZones": [
+        { "q": 2, "r": 8 },
+        { "q": 3, "r": 8 },
+        { "q": 4, "r": 8 },
+        { "q": 3, "r": 9 },
+        { "q": 4, "r": 9 }
+    ],
+
+    "additionalEnemies": []
+}

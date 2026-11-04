@@ -1,22 +1,22 @@
 fetch("data/tickets.json")
-.then(response => response.json())
-.then(data => {
+    .then(response => response.json())
+    .then(data => {
 
-    document.getElementById("last-updated").textContent =
-        "Last updated: " +
-        new Date(data.lastUpdated).toLocaleString();
+        document.getElementById("last-updated").textContent =
+            "Last updated: " +
+            new Date(data.lastUpdated).toLocaleString();
 
-    const tickets = data.tickets;
+        const tickets = data.tickets;
 
-    const columns = {
-        "To Do": document.getElementById("todo"),
-        "In Progress": document.getElementById("progress"),
-        "Done": document.getElementById("done")
-    };
+        const columns = {
+            "To Do": document.getElementById("todo"),
+            "In Progress": document.getElementById("progress"),
+            "Done": document.getElementById("done")
+        };
 
-    tickets.forEach(ticket => {
+        tickets.forEach(ticket => {
 
-        const card = `
+            const card = `
             <div class="ticket">
 
                 <strong>${ticket.id}</strong>
@@ -27,26 +27,26 @@ fetch("data/tickets.json")
                     Priority: ${ticket.priority}
                 </small>
 
-            </div>
+            </div> 
         `;
 
-        if (columns[ticket.status]) {
+            if (columns[ticket.status]) {
 
-            columns[ticket.status].innerHTML += card;
+                columns[ticket.status].innerHTML += card;
 
-        } else {
+            } else {
 
-            console.log(
-                "Unknown Jira status:",
-                ticket.status
-            );
+                console.log(
+                    "Unknown Jira status:",
+                    ticket.status
+                );
 
-        }
+            }
+        });
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
     });
-
-})
-.catch(error => {
-
-    console.error(error);
-
-});

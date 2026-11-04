@@ -1,4 +1,4 @@
-# Tacticus Raid Lab — Milestone 1.2
+# Tacticus Raid Lab — Milestone 2.0 (event-engine foundation)
 
 Static, dependency-free prototype for GitHub Pages. Initial boss: Screamer-Killer. Initial team: Trajann Valoris, Kariyan Helsates, Laviscus, Boss Gulgortz and Vitruvius.
 
@@ -8,28 +8,25 @@ Copy the entire `tacticus/` folder into the root of your website repository. Com
 
 For local testing, run `python3 -m http.server 8000` from the repository root, then visit `http://localhost:8000/tacticus/`. Loading `index.html` with `file://` will not work because JSON is fetched using `fetch()`.
 
-## Current features
+## What's new in this release
 
-- Responsive interactive hex grid, unit selection, click-to-reposition, tile elevation editing.
-- Editable manual stats and notes for six entities; no fabricated in-game stats.
-- Provisional deterministic per-hit attack model, target HP tracking, turn counter and event log.
-- Undo (last 100 edits/actions), reset positions/combat, localStorage save, JSON import/export.
-- No third-party dependencies, build process, API keys or external requests.
+- Per-hit event processing, including attack ownership, active completion and after-attack passives.
+- Each friendly character can act once per turn; Next Turn resets action and effect state.
+- Multi-hex adjacency checks for the Trajann/Kariyan interaction.
+- Kariyan active resolves before his follow-up passive. If another adjacent ally completed an active earlier, the bonus hits instead apply to Kariyan's active.
+- Laviscus tracks the largest *actual resolved* hit per other ally, across normal, active and follow-up attacks. His snapshot locks when he attacks.
+- The Actions panel now offers Normal Attack or Active Ability (provisional).
+- Visible Laviscus per-unit contribution summary and detailed combat event log.
+- `test-engine.mjs` is a zero-dependency Node.js regression test. Run `node test-engine.mjs` inside `tacticus/`.
 
-## Important limitations
+## Explicit limitations
 
-**This is a scaffold, not a verified Tacticus combat simulator yet.** The armour calculation is a *placeholder approximation*, not a claim about Tacticus mechanics. Attack range, elevations, movement rules, crits, blocks, ability effects, triggered attacks, adds, summons and boss AI are not simulated. Flat bonus is simply added per hit. Initial health/damage/armour values are intentionally zero until entered by the user. The simulator does not automatically persist every change: click **Save locally** or **Export JSON**.
+**This is a mechanics scaffold, not a verified Tacticus combat simulation.** The active attack profiles are placeholders: Kariyan's active is provisionally three hits, his passive one hit, and Trajann's qualifying bonus two hits. Other characters' active selections currently use their normal attack profile as a *placeholder*, not their real active abilities. Trajann's full eligibility and damage-stat buff, Laviscus's exact scaling and attack application, ability damage types, crits, blocks, armour, elevation and ranged targeting need verification. The old simplified armour formula is still used.
 
-Next milestone: add verified damage mechanics and data-driven active/passive rules with regression cases from battle footage.
+For Laviscus, the collected amount is **temporarily added to his raw damage per hit** solely to make the snapshot visible in an end-to-end test. This is not yet a verified in-game formula. Do not treat the displayed damage totals as accurate raid predictions.
 
+The boss remains stationary and does not act. No adds or summons are simulated.
 
-## Milestone 1.1: taller board and boss footprints
+## Installation and save compatibility
 
-- Default board is 9 columns × 11 rows. Old saved 9 × 6 boards are expanded on load without losing existing tile elevations or unit stats. Save locally again to persist the expansion.
-- Bosses can occupy multiple hexes; every occupied hex blocks ally placement and is clickable to select the boss.
-- Select Screamer-Killer in the Inspector to edit its footprint as a JSON array of **axial coordinate offsets** relative to its anchor. Include `{ "q": 0, "r": 0 }`. The initial three-hex footprint is an illustration, not verified game geometry.
-- Multi-hex adjacency/range rules are not yet enforced by the provisional combat model.
-
-## 1.2 display fix
-
-The board now displays all 11 rows without a 640px height cap, with horizontal scrolling on narrow screens. The Screamer-Killer footprint is three illustrative hexes by default. The HTML uses cache-busting query strings for the updated CSS and JS. Existing browser saves are migrated; if you previously saved a one-hex footprint, select Screamer-Killer and edit the Boss footprint field to `[ {"q":0,"r":0}, {"q":1,"r":0}, {"q":0,"r":1} ]`.
+Copy the `tacticus/` folder to your repository branch. No homepage changes. Existing local saves are retained and combat state is initialized on demand. Export saves before testing new mechanics. Undo snapshots include turn state and the event log.
