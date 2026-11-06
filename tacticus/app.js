@@ -1,3 +1,4 @@
+import { summarizeDamage } from './damage-summary.js';
 import { clone, key, makeTiles, attack, performCombatAction, advanceTurn, occupiedHexes, isOccupied, offsetToAxial, axialToOffset } from './engine.js';
 const $ = id => document.getElementById(id);
 const storageKey = 'tacticus-raid-lab-v1';
@@ -185,6 +186,18 @@ else if (tool === 'elevation') {
     $('elevationInput').focus();
 } render(); }
 function renderLog() {
+    const summary = summarizeDamage(state.log, state.turn);
+    const format = value => value.toLocaleString();
+    $('battleDamageTotal').textContent = format(summary.battleTotal);
+    $('turnDamageTotal').textContent = format(summary.currentTurnTotal);
+    $('turnDamageBreakdown').textContent = Object.entries(summary.byTurn)
+        .sort(([a], [b]) => Number(a) - Number(b))
+        .map(([turn, amount]) => `Turn ${turn}: ${format(amount)}`)
+        .join(' · ') || 'No damage recorded';
+    $('characterDamageBreakdown').textContent = Object.entries(summary.byCharacter)
+        .sort((a, b) => b[1] - a[1])
+        .map(([id, amount]) => `${state.units.find(unit => unit.id === id)?.name ?? id}: ${format(amount)}`)
+        .join(' · ') || 'No damage recorded';
     const attackCount = state.log.filter(entry => entry.kind === 'attack').length;
     $('turnLabel').textContent = `Turn ${state.turn} • ${attackCount} attacks`;
 
@@ -230,6 +243,7 @@ function makeCombatReport() {
         tiles: clone(state.tiles),
         battle: clone(state.battle ?? {}),
         combat: clone(state.combat ?? {}),
+        damageSummary: summarizeDamage(state.log, state.turn),
         // Logs are stored newest-first for the UI; export oldest-first for analysis.
         log: clone(state.log).reverse()
     };
@@ -254,6 +268,12 @@ function formatCombatReport(report) {
         `Exported: ${report.exportedAt}`,
         `Current turn: ${report.turn}`,
         `Log entries: ${report.log.length}`,
+        '',
+        'DAMAGE SUMMARY',
+        `Battle total: ${report.damageSummary.battleTotal.toLocaleString()}`,
+        `Current turn total: ${report.damageSummary.currentTurnTotal.toLocaleString()}`,
+        `By turn: ${JSON.stringify(report.damageSummary.byTurn)}`,
+        `By character: ${JSON.stringify(report.damageSummary.byCharacter)}`,
         '',
         'UNITS',
         ...report.units.map(u =>

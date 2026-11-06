@@ -39,6 +39,19 @@
                 "pierce": null,
                 "range": 0
             }
+        },
+        "activeEffect": {
+            "kind": "defensive",
+            "heal": 5983,
+            "blockChanceBonus": 20,
+            "blockDamageBonus": 1197,
+            "counterHits": 2,
+            "counterDamageRange": [
+                3191,
+                3989
+            ],
+            "counterDamageType": "bolter",
+            "notes": "Moment Shackle; defensive buff and movement counter pending enemy-turn simulation."
         }
     },
     {
@@ -86,7 +99,12 @@
             "hits": 3,
             "damageType": "eviscerating",
             "pierce": 50,
-            "range": 1
+            "range": 1,
+            "damageRange": [
+                2992,
+                3589
+            ],
+            "notes": "Level-50 ability range; simulator uses midpoint until roll selection is added."
         }
     },
     {
@@ -134,7 +152,12 @@
             "hits": 1,
             "damageType": "power",
             "pierce": 40,
-            "range": 1
+            "range": 1,
+            "damageRange": [
+                3989,
+                4786
+            ],
+            "notes": "Euphoric Strikes level 50; +30% crit chance for next attack not yet simulated."
         }
     },
     {
@@ -156,7 +179,7 @@
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay. Level-50 Light Im Up passive: 3x 1496\u20131996 Projectile damage after normal attack (pending implementation). WAAAGH! +797 damage/+1 melee hit (pending implementation).",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -219,6 +242,18 @@
                 "pierce": 60,
                 "range": 2
             }
+        },
+        "activeAttack": {
+            "hits": 1,
+            "damageType": "toxic",
+            "pierce": 70,
+            "range": 3,
+            "damageRange": [
+                4487,
+                5483
+            ],
+            "ignoresModifiers": true,
+            "notes": "Rad-Bombardment level 50; single target approximation only; line, contamination and suppression not simulated."
         }
     }
 ]

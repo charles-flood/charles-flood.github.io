@@ -70,3 +70,22 @@ ordering, pierce, passives and positioning. **Export TXT** provides a readable
 summary of the same events. Neither export uploads data to a server; both are
 created locally in the browser. Exports reflect the current state only (not
 previously undone actions), and clearing the log removes past entries.
+
+### Ability damage correction (Milestone 4.2)
+
+- Kariyan's level-50 active uses its own Eviscerating raw-damage range
+  (2,992–3,589), and his Big Target passive uses its own Piercing range
+  (4,786–5,983). For reproducible tests the engine currently uses the
+  midpoint of each range; actual in-game damage rolls can vary.
+- Trajann's passive independently adds 1,096 raw damage to qualifying hits
+  after a friendly adjacent unit has completed an active, while its separate
+  +2-hit effect remains limited to the first eligible non-normal attack.
+- Kariyan's provisional 33% additive growth now counts **previous turns** in
+  which he attacked, rather than individual attacks. The exact application
+  and stacking are subject to gameplay verification.
+- Laviscus's default Outrage percentage is now 120%. The simulator still
+  needs the full wiki eligibility conditions and timing implemented.
+- The simplified armour calculation remains `floor(max(raw - armour,
+  raw * pierceRatio))`. Damage-type pierce ratios are unchanged.
+- The browser's saved state can override bundled character defaults. Use
+  **Load reference stats** when validating the updated attack profiles.

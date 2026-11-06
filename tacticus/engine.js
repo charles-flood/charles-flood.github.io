@@ -146,7 +146,10 @@ function resolveAttack(state, spec, queue, rules) {
         kind: spec.kind,
         hits: Math.floor(profile.hits),
         damageMultiplier: 1,
-        flatDamageBonus: spec.flatBonus ?? 0
+        flatDamageBonus: spec.flatBonus ?? 0,
+        damageType: profile.damageType,
+        ignoresModifiers: Boolean(profile.ignoresModifiers),
+        extraHits: []
     };
     const context = {
         state,
@@ -158,39 +161,65 @@ function resolveAttack(state, spec, queue, rules) {
 
     dispatchAbilityEvent(context, 'BEFORE_ATTACK', payload);
     const pierce = Math.max(0, Math.min(1, getProfilePierce(profile) / 100));
-    const rawPerHit = Math.max(0, (attacker.stats.damage + payload.flatDamageBonus) * payload.damageMultiplier);
+    // Ability profiles may specify their own raw damage range, independent of
+    // the unit's normal Damage stat. Use a reproducible midpoint until a roll
+    // selector is exposed in the UI; record the chosen value for verification.
+    const baseRawDamage = Array.isArray(profile.damageRange)
+        ? (profile.damageRange[0] + profile.damageRange[1]) / 2
+        : (Number.isFinite(profile.rawDamage) ? profile.rawDamage : attacker.stats.damage);
+    const rawPerHit = Math.max(0,
+        baseRawDamage * payload.damageMultiplier +
+        (payload.ignoresModifiers ? 0 : payload.flatDamageBonus));
     let damage = 0;
     const hitDamage = [];
 
-    addEvent(state, { type: 'ATTACK_STARTED', attackerId: attacker.id,
-        detail: `${spec.kind}, ${payload.hits} hits, ${profile.damageType ?? 'custom'} (${getProfilePierce(profile)}% pierce), ${payload.damageMultiplier.toFixed(3)}x` });
+    addEvent(state, {
+        type: 'ATTACK_STARTED', attackerId: attacker.id,
+        detail: `${spec.kind}, ${payload.hits} hits, ${profile.damageType ?? 'custom'} (${getProfilePierce(profile)}% pierce), base raw ${baseRawDamage.toFixed(1)}, ${payload.damageMultiplier.toFixed(3)}x`
+    });
 
-    for (let index = 0; index < payload.hits && target.stats.health > 0; index++) {
+    const hitSpecs = [
+        ...Array.from({ length: payload.hits }, () => ({ source: null, maxDamage: Infinity })),
+        ...payload.extraHits
+    ];
+
+    for (let index = 0; index < hitSpecs.length && target.stats.health > 0; index++) {
         dispatchAbilityEvent(context, 'BEFORE_HIT', { ...payload, hitIndex: index });
-        const calculated = Math.floor(Math.max(rawPerHit - target.stats.armour, rawPerHit * pierce, 0));
+        const calculated = Math.min(hitSpecs[index].maxDamage,
+            Math.floor(Math.max(rawPerHit - target.stats.armour, rawPerHit * pierce, 0)));
         const actual = Math.min(calculated, target.stats.health);
         target.stats.health -= actual;
         damage += actual;
         hitDamage.push(actual);
         recordResolvedHit(state, attacker.id, actual);
-        addEvent(state, { type: 'HIT_RESOLVED', attackerId: attacker.id, targetId: target.id,
-            source: spec.source ?? spec.kind, hit: index + 1, damage: actual,
-            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${payload.hits}; ${profile.damageType ?? 'custom'}, ${getProfilePierce(profile)}% pierce; raw ${rawPerHit.toFixed(0)}, armour ${target.stats.armour})` });
+        addEvent(state, {
+            type: 'HIT_RESOLVED', attackerId: attacker.id, targetId: target.id,
+            source: hitSpecs[index].source ?? spec.source ?? spec.kind, hit: index + 1, damage: actual,
+            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${hitSpecs.length}; ${profile.damageType ?? 'custom'}, ${getProfilePierce(profile)}% pierce; raw ${rawPerHit.toFixed(0)}, armour ${target.stats.armour}${Number.isFinite(hitSpecs[index].maxDamage) ? `, capped at ${hitSpecs[index].maxDamage}` : ''})`
+        });
         dispatchAbilityEvent(context, 'HIT_RESOLVED', { ...payload, hitIndex: index, damage: actual });
     }
 
-    ensureBattleState(state).attacksByUnit[attacker.id] =
-        (state.battle.attacksByUnit[attacker.id] ?? 0) + 1;
+    const battle = ensureBattleState(state);
+    battle.attacksByUnit[attacker.id] = (battle.attacksByUnit[attacker.id] ?? 0) + 1;
+    battle.attackTurnsByUnit[attacker.id] ??= [];
+    if (!battle.attackTurnsByUnit[attacker.id].includes(state.turn)) {
+        battle.attackTurnsByUnit[attacker.id].push(state.turn);
+    }
 
     if (spec.kind === 'active') {
         completedActive(state, attacker.id, target.id);
-        addEvent(state, { type: 'ACTIVE_COMPLETED', attackerId: attacker.id,
-            detail: `${attacker.name} active completed` });
+        addEvent(state, {
+            type: 'ACTIVE_COMPLETED', attackerId: attacker.id,
+            detail: `${attacker.name} active completed`
+        });
         dispatchAbilityEvent(context, 'ACTIVE_COMPLETED', payload);
     }
 
-    addEvent(state, { type: 'ATTACK_COMPLETED', attackerId: attacker.id,
-        detail: `${damage.toLocaleString()} total damage` });
+    addEvent(state, {
+        type: 'ATTACK_COMPLETED', attackerId: attacker.id,
+        detail: `${damage.toLocaleString()} total damage`
+    });
     dispatchAbilityEvent(context, 'ATTACK_COMPLETED', payload);
     return { damage, hits: hitDamage.length, hitDamage };
 }
@@ -207,6 +236,35 @@ export function performCombatAction(previous, options) {
     }
 
     const active = options.kind === 'active';
+    if (active && actor.activeEffect?.kind === 'defensive') {
+        const effect = actor.activeEffect;
+        const healed = Math.min(effect.heal, Math.max(0,
+            (actor.stats.maxHealth ?? actor.stats.health) - actor.stats.health));
+        actor.stats.health += healed;
+        turn.defensiveEffects ??= {};
+        turn.defensiveEffects[actor.id] = {
+            blockChanceBonus: effect.blockChanceBonus,
+            blockDamageBonus: effect.blockDamageBonus,
+            counterHits: effect.counterHits,
+            counterDamageRange: effect.counterDamageRange,
+            counterDamageType: effect.counterDamageType
+        };
+        completedActive(state, actor.id, options.targetId);
+        addEvent(state, {
+            type: 'DEFENSIVE_ACTIVE', attackerId: actor.id,
+            detail: `Moment Shackle: healed ${healed}; +${effect.blockChanceBonus}% block, +${effect.blockDamageBonus} block damage; movement counter pending enemy simulation`
+        });
+        addEvent(state, {
+            type: 'ACTIVE_COMPLETED', attackerId: actor.id,
+            detail: `${actor.name} active completed`
+        });
+        turn.acted[actor.id] = true;
+        addEvent(state, {
+            type: 'ACTION_COMPLETED', attackerId: actor.id,
+            detail: `${actor.name} finished their action`
+        });
+        return state;
+    }
     const queue = [{
         ...options,
         kind: active ? 'active' : 'normal',
@@ -226,8 +284,10 @@ export function performCombatAction(previous, options) {
     }
 
     turn.acted[actor.id] = true;
-    addEvent(state, { type: 'ACTION_COMPLETED', attackerId: actor.id,
-        detail: `${actor.name} finished their action` });
+    addEvent(state, {
+        type: 'ACTION_COMPLETED', attackerId: actor.id,
+        detail: `${actor.name} finished their action`
+    });
     return state;
 }
 
