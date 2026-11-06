@@ -12,6 +12,7 @@ const make = () => {
     units.find(u => u.id === 'trajann').position = { q: 4, r: 2 };
     units.find(u => u.id === 'kariyan').position = { q: 4, r: 3 };
     units.find(u => u.id === 'vitruvius').position = { q: 5, r: 4 };
+    units.find(u => u.id === 'laviscus').position = { q: 6, r: 3 };
     return { units, tiles: [], turn: 1, log: [] };
 };
 let a = performCombatAction(make(), { attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'active' });
@@ -31,3 +32,33 @@ assert.throws(() => performCombatAction(b, { attackerId: 'laviscus', targetId: '
 b = advanceTurn(b);
 assert.equal(b.combat.laviscusLocked, null);
 console.log('All event ordering and snapshot tests passed');
+
+// Normal attack must not consume Trajann's bonus; the queued passive receives it.
+let c = performCombatAction(make(), { attackerId: 'vitruvius', targetId: 'screamer-killer', kind: 'active' });
+c = performCombatAction(c, { attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'normal' });
+assert.equal(c.log.filter(x => x.type === 'HIT_RESOLVED' && x.source?.includes('follow-up')).length, 3);
+assert.equal(c.battle.attacksByUnit.kariyan, 2);
+assert.deepEqual(c.log.filter(x => x.type === 'DAMAGE_GROWTH' && x.attackerId === 'kariyan')
+    .map(x => x.detail).reverse(), ['Attack 1: 1.000x', 'Attack 2: 1.100x']);
+c = advanceTurn(c);
+c = performCombatAction(c, { attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'normal' });
+assert.equal(c.battle.attacksByUnit.kariyan, 4);
+assert.deepEqual(c.log.filter(x => x.type === 'DAMAGE_GROWTH' && x.attackerId === 'kariyan')
+    .map(x => x.detail).slice(0, 2).reverse(), ['Attack 3: 1.200x', 'Attack 4: 1.300x']);
+
+// Laviscus receives a percentage, not the entire accumulated hit sum.
+let d = make();
+d.rules = { laviscusHighestHitPercentage: 0.25 };
+d = performCombatAction(d, { attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'active' });
+const largest = d.combat.highestHitByUnit.kariyan;
+d = performCombatAction(d, { attackerId: 'laviscus', targetId: 'screamer-killer', kind: 'normal' });
+assert.equal(d.combat.laviscusLocked.contributions.kariyan, largest);
+assert.ok(d.log.some(x => x.type === 'LAVISCUS_SNAPSHOT' && x.detail.includes('25.0%')));
+
+// A melee normal attack cannot be made from a distant hex.
+const distant = make();
+distant.units.find(u => u.id === 'kariyan').position = { q: 0, r: 10 };
+assert.throws(() => performCombatAction(distant, {
+    attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'normal'
+}), /adjacency/);
+console.log('Growth, passive follow-up, Laviscus percentage and positioning tests passed');

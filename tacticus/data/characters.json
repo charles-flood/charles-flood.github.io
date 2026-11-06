@@ -77,6 +77,10 @@
                 "pierce": null,
                 "damageType": null
             }
+        },
+        "activeAttack": {
+            "hits": 3,
+            "pierce": 40
         }
     },
     {

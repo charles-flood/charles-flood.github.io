@@ -11,8 +11,10 @@ const attackFields = {
 };
 async function boot() {
     try {
-        const [characters, bosses] = await Promise.all(['./data/characters.json', './data/bosses.json'].map(url => fetch(url).then(r => { if (!r.ok)
-            throw Error(`Could not load ${url}`); return r.json(); })));
+        const [characters, bosses] = await Promise.all(['./data/characters.json', './data/bosses.json'].map(url => fetch(url).then(r => {
+            if (!r.ok)
+                throw Error(`Could not load ${url}`); return r.json();
+        })));
         initial = { units: [...characters, ...bosses], tiles: makeTiles(), turn: 1, log: [] };
         try {
             const saved = JSON.parse(localStorage.getItem(storageKey));
@@ -59,8 +61,10 @@ function migrateState(saved) {
 function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function unit(id) { return state.units.find(u => u.id === id); }
 function tile(q, r) { return state.tiles.find(t => t.q === q && t.r === r); }
-function snapshot() { history.push(clone(state)); if (history.length > 100)
-    history.shift(); }
+function snapshot() {
+    history.push(clone(state)); if (history.length > 100)
+        history.shift();
+}
 function render() {
     renderBoard();
     renderSelects();
@@ -131,8 +135,10 @@ function renderBoard() {
     svg.replaceChildren();
     const ns = 'http://www.w3.org/2000/svg', radius = 43, xStep = Math.sqrt(3) * radius, yStep = radius * 1.5, ox = 70, oy = 68;
     svg.setAttribute('viewBox', `0 0 ${ox + 9 * xStep + radius} ${oy + 10 * yStep + radius}`);
-    const node = (name, attrs, parent = svg) => { const el = document.createElementNS(ns, name); for (const [k, v] of Object.entries(attrs))
-        el.setAttribute(k, v); parent.appendChild(el); return el; };
+    const node = (name, attrs, parent = svg) => {
+        const el = document.createElementNS(ns, name); for (const [k, v] of Object.entries(attrs))
+            el.setAttribute(k, v); parent.appendChild(el); return el;
+    };
     const xy = (q, r) => ({ x: ox + q * xStep + (r % 2) * xStep / 2, y: oy + r * yStep });
     for (const t of state.tiles) {
         const { x, y } = xy(t.q, t.r), points = Array.from({ length: 6 }, (_, i) => { const a = (60 * i - 30) * Math.PI / 180; return `${x + radius * Math.cos(a)},${y + radius * Math.sin(a)}`; }).join(' ');
@@ -161,16 +167,18 @@ function renderBoard() {
         title.textContent = u.name;
     }
 }
-function onHex(t) { selectedTile = { q: t.q, r: t.r }; if (tool === 'move') {
-    const u = unit(selectedId);
-    if (u && u.team === 'ally' && !isOccupied(state, t, u.id)) {
-        snapshot();
-        u.position = { q: t.q, r: t.r };
+function onHex(t) {
+    selectedTile = { q: t.q, r: t.r }; if (tool === 'move') {
+        const u = unit(selectedId);
+        if (u && u.team === 'ally' && !isOccupied(state, t, u.id)) {
+            snapshot();
+            u.position = { q: t.q, r: t.r };
+        }
     }
+    else if (tool === 'elevation') {
+        $('elevationInput').focus();
+    } render();
 }
-else if (tool === 'elevation') {
-    $('elevationInput').focus();
-} render(); }
 function renderLog() {
     const attackCount = state.log.filter(entry => entry.kind === 'attack').length;
     $('turnLabel').textContent = `Turn ${state.turn} • ${attackCount} attacks`;
@@ -198,11 +206,15 @@ function renderLog() {
 
 function bind() {
     $('unitSelect').addEventListener('change', e => { selectedId = e.target.value; selectedTile = { ...unit(selectedId).position }; render(); });
-    fields.forEach(f => $(f).addEventListener('change', e => { const n = Number(e.target.value); if (!Number.isFinite(n))
-        return; snapshot(); unit(selectedId).stats[f] = Math.max(0, n); render(); }));
+    fields.forEach(f => $(f).addEventListener('change', e => {
+        const n = Number(e.target.value); if (!Number.isFinite(n))
+            return; snapshot(); unit(selectedId).stats[f] = Math.max(0, n); render();
+    }));
     for (const [id, [mode, property]] of Object.entries(attackFields)) {
-        $(id).addEventListener('change', e => { const raw = e.target.value.trim(); const n = raw === '' ? null : Number(raw); if (n !== null && !Number.isFinite(n))
-            return; snapshot(); const u = unit(selectedId); u.attacks ??= {}; u.attacks[mode] ??= {}; u.attacks[mode][property] = n === null ? null : Math.max(0, n); render(); });
+        $(id).addEventListener('change', e => {
+            const raw = e.target.value.trim(); const n = raw === '' ? null : Number(raw); if (n !== null && !Number.isFinite(n))
+                return; snapshot(); const u = unit(selectedId); u.attacks ??= {}; u.attacks[mode] ??= {}; u.attacks[mode][property] = n === null ? null : Math.max(0, n); render();
+        });
     }
     $('notes').addEventListener('change', e => { snapshot(); unit(selectedId).notes = e.target.value; });
     $('footprintInput').addEventListener('change', e => {
@@ -236,8 +248,10 @@ function bind() {
     });
     $('moveTool').onclick = () => { tool = 'move'; renderInspector(); };
     $('heightTool').onclick = () => { tool = 'elevation'; renderInspector(); };
-    $('elevationInput').onchange = e => { if (!selectedTile)
-        return; snapshot(); tile(selectedTile.q, selectedTile.r).elevation = Math.max(-3, Math.min(3, Math.round(Number(e.target.value) || 0))); render(); };
+    $('elevationInput').onchange = e => {
+        if (!selectedTile)
+            return; snapshot(); tile(selectedTile.q, selectedTile.r).elevation = Math.max(-3, Math.min(3, Math.round(Number(e.target.value) || 0))); render();
+    };
     $('attackBtn').onclick = () => {
         try {
             const next = performCombatAction(state, {
@@ -254,53 +268,67 @@ function bind() {
             alert(error.message);
         }
     };
-    $('undoBtn').onclick = () => { if (history.length) {
-        state = history.pop();
-        render();
-    } };
-    $('nextTurnBtn').onclick = () => { snapshot(); state = advanceTurn(state); render(); };
-    $('resetBattleBtn').onclick = () => { if (!confirm('Reset combat history and turn counter? Unit stats and positions will remain.'))
-        return; snapshot(); state.log = []; state.turn = 1; state.combat = undefined; render(); };
-    $('clearLogBtn').onclick = () => { snapshot(); state.log = []; render(); };
-    $('loadStatsBtn').onclick = () => { if (!confirm('Replace character and boss stats with bundled reference values? Positions and combat log will be kept.'))
-        return; snapshot(); for (const u of state.units) {
-        const ref = initial.units.find(x => x.id === u.id);
-        if (ref) {
-            u.stats = clone(ref.stats);
-            u.attacks = clone(ref.attacks);
-            u.progression = clone(ref.progression);
-            u.difficulty = ref.difficulty;
-            u.attacksMigrated = true;
+    $('undoBtn').onclick = () => {
+        if (history.length) {
+            state = history.pop();
+            render();
         }
-    } render(); };
-    $('resetDefaultsBtn').onclick = () => { if (!confirm('Replace all units, stats, positions and combat history with reference defaults? Your current browser configuration will be lost.'))
-        return; snapshot(); state = clone(initial); selectedId = 'trajann'; selectedTile = null; localStorage.removeItem(storageKey); render(); };
-    $('resetPositions').onclick = () => { snapshot(); for (const u of state.units) {
-        const orig = initial.units.find(v => v.id === u.id);
-        if (orig)
-            u.position = clone(orig.position);
-    } render(); };
-    $('saveBtn').onclick = () => { try {
-        localStorage.setItem(storageKey, JSON.stringify(state));
-        $('saveBtn').textContent = 'Saved ✓';
-        setTimeout(() => $('saveBtn').textContent = 'Save locally', 1500);
-    }
-    catch (e) {
-        alert('Save failed: ' + e.message);
-    } };
+    };
+    $('nextTurnBtn').onclick = () => { snapshot(); state = advanceTurn(state); render(); };
+    $('resetBattleBtn').onclick = () => {
+        if (!confirm('Reset combat history and turn counter? Unit stats and positions will remain.'))
+            return; snapshot(); state.log = []; state.turn = 1; state.combat = undefined; state.battle = undefined; render();
+    };
+    $('clearLogBtn').onclick = () => { snapshot(); state.log = []; render(); };
+    $('loadStatsBtn').onclick = () => {
+        if (!confirm('Replace character and boss stats with bundled reference values? Positions and combat log will be kept.'))
+            return; snapshot(); for (const u of state.units) {
+                const ref = initial.units.find(x => x.id === u.id);
+                if (ref) {
+                    u.stats = clone(ref.stats);
+                    u.attacks = clone(ref.attacks);
+                    u.progression = clone(ref.progression);
+                    u.difficulty = ref.difficulty;
+                    u.attacksMigrated = true;
+                }
+            } render();
+    };
+    $('resetDefaultsBtn').onclick = () => {
+        if (!confirm('Replace all units, stats, positions and combat history with reference defaults? Your current browser configuration will be lost.'))
+            return; snapshot(); state = clone(initial); selectedId = 'trajann'; selectedTile = null; localStorage.removeItem(storageKey); render();
+    };
+    $('resetPositions').onclick = () => {
+        snapshot(); for (const u of state.units) {
+            const orig = initial.units.find(v => v.id === u.id);
+            if (orig)
+                u.position = clone(orig.position);
+        } render();
+    };
+    $('saveBtn').onclick = () => {
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(state));
+            $('saveBtn').textContent = 'Saved ✓';
+            setTimeout(() => $('saveBtn').textContent = 'Save locally', 1500);
+        }
+        catch (e) {
+            alert('Save failed: ' + e.message);
+        }
+    };
     $('exportBtn').onclick = () => { const blob = new Blob([JSON.stringify({ schemaVersion: 1, ...state }, null, 2)], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = 'tacticus-raid-lab.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
-    $('importFile').onchange = async (e) => { const file = e.target.files?.[0]; if (!file)
-        return; try {
-        const loaded = JSON.parse(await file.text());
-        if (!validState(loaded))
-            throw Error('Invalid raid lab save file');
-        snapshot();
-        state = migrateState({ units: loaded.units, tiles: loaded.tiles, turn: loaded.turn, log: loaded.log });
-        selectedId = state.units[0].id;
-        render();
-    }
-    catch (err) {
-        alert('Import failed: ' + err.message);
-    } e.target.value = ''; };
+    $('importFile').onchange = async (e) => {
+        const file = e.target.files?.[0]; if (!file)
+            return; try {
+                const loaded = JSON.parse(await file.text());
+                if (!validState(loaded))
+                    throw Error('Invalid raid lab save file');
+                snapshot();
+                state = migrateState({ units: loaded.units, tiles: loaded.tiles, turn: loaded.turn, log: loaded.log });
+                selectedId = state.units[0].id;
+                render();
+            }
+        catch (err) {
+            alert('Import failed: ' + err.message);
+        } e.target.value = '';
+    };
 }
 boot();
