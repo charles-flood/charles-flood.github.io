@@ -1,0 +1,13 @@
+{
+    "physical": 1,
+    "power": 40,
+    "piercing": 80,
+    "eviscerating": 50,
+    "bolter": 20,
+    "plasma": 65,
+    "psychic": 100,
+    "direct": 100,
+    "projectile": 15,
+    "molecular": 60,
+    "toxic": 70
+}

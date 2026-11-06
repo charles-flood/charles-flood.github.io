@@ -1,5 +1,29 @@
 // Intentionally provisional combat model. NOT a verified Tacticus damage formula.
 export const clone = value => structuredClone(value);
+
+// Central registry: an attack's damage type supplies its pierce ratio.
+// An explicit profile.pierce is retained as an editable override.
+export const DAMAGE_TYPES = Object.freeze({
+    physical: 1,
+    power: 40,
+    piercing: 80,
+    eviscerating: 50,
+    bolter: 20,
+    plasma: 65,
+    psychic: 100,
+    direct: 100,
+    projectile: 15,
+    molecular: 60,
+    toxic: 70
+});
+
+export function getProfilePierce(profile) {
+    if (Number.isFinite(profile?.pierce)) {
+        return profile.pierce;
+    }
+    return DAMAGE_TYPES[profile?.damageType] ?? null;
+}
+
 export const key = ({ q, r }) => `${q},${r}`;
 export function makeTiles(cols = 9, rows = 11) { return Array.from({ length: cols * rows }, (_, i) => ({ q: i % cols, r: Math.floor(i / cols), elevation: 0 })); }
 export function attack(state, attackerId, targetId, flatBonus = 0, attackType = 'melee') {
@@ -13,15 +37,15 @@ export function attack(state, attackerId, targetId, flatBonus = 0, attackType = 
     const profile = a.attacks?.[attackType];
     if (!profile || !Number.isFinite(profile.hits) || profile.hits < 1)
         throw Error(`No ${attackType} attack configured for ${a.name}.`);
-    if (!Number.isFinite(profile.pierce))
+    if (!Number.isFinite(getProfilePierce(profile)))
         throw Error(`Set the ${attackType} pierce percentage for ${a.name} first.`);
-    const hits = Math.floor(profile.hits), pierce = Math.max(0, Math.min(1, profile.pierce / 100));
+    const hits = Math.floor(profile.hits), pierce = Math.max(0, Math.min(1, getProfilePierce(profile) / 100));
     const rawPerHit = Math.max(0, a.stats.damage + flatBonus);
     // Simplified approximation: armour cannot reduce damage below pierce-protected portion.
     const afterArmour = Math.max(rawPerHit - t.stats.armour, rawPerHit * pierce, 0);
     const perHit = Math.floor(afterArmour), damage = Math.min(t.stats.health, perHit * hits);
     t.stats.health -= damage;
-    const entry = { turn: next.turn, attacker: a.name, target: t.name, hits, rawPerHit, armour: t.stats.armour, pierce: profile.pierce, attackType, perHit, damage, remaining: t.stats.health, kind: 'attack' };
+    const entry = { turn: next.turn, attacker: a.name, target: t.name, hits, rawPerHit, armour: t.stats.armour, pierce: getProfilePierce(profile), damageType: profile.damageType ?? null, attackType, perHit, damage, remaining: t.stats.health, kind: 'attack' };
     next.log.unshift(entry);
     return next;
 }
@@ -98,7 +122,7 @@ function resolveAttack(state, spec, queue, rules) {
 
     const attackType = spec.attackType ?? 'melee';
     const profile = spec.profile ?? attacker.attacks?.[attackType];
-    if (!profile || !Number.isFinite(profile.hits) || profile.hits < 1 || !Number.isFinite(profile.pierce)) {
+    if (!profile || !Number.isFinite(profile.hits) || profile.hits < 1 || !Number.isFinite(getProfilePierce(profile))) {
         throw Error('Configure the attack hits and pierce before resolving this attack.');
     }
 
@@ -106,9 +130,14 @@ function resolveAttack(state, spec, queue, rules) {
     if (spec.kind === 'normal' && attackType === 'melee' && !adjacentToUnit(attacker, target)) {
         throw Error('Melee attacks require adjacency to the target footprint.');
     }
-    if (spec.kind === 'normal' && attackType === 'ranged' &&
-        distanceToUnit(attacker, target) > (profile.range ?? 3)) {
-        throw Error('Target is outside the configured ranged attack distance.');
+    if (spec.kind === 'normal' && attackType === 'ranged') {
+        const distance = distanceToUnit(attacker, target);
+        if (distance <= 1) {
+            throw Error('Adjacent targets must use the melee profile.');
+        }
+        if (distance > (profile.range ?? 3)) {
+            throw Error('Target is outside the configured ranged attack distance.');
+        }
     }
 
     const payload = {
@@ -128,15 +157,13 @@ function resolveAttack(state, spec, queue, rules) {
     };
 
     dispatchAbilityEvent(context, 'BEFORE_ATTACK', payload);
-    const pierce = Math.max(0, Math.min(1, profile.pierce / 100));
+    const pierce = Math.max(0, Math.min(1, getProfilePierce(profile) / 100));
     const rawPerHit = Math.max(0, (attacker.stats.damage + payload.flatDamageBonus) * payload.damageMultiplier);
     let damage = 0;
     const hitDamage = [];
 
-    addEvent(state, {
-        type: 'ATTACK_STARTED', attackerId: attacker.id,
-        detail: `${spec.kind}, ${payload.hits} hits, ${payload.damageMultiplier.toFixed(3)}x`
-    });
+    addEvent(state, { type: 'ATTACK_STARTED', attackerId: attacker.id,
+        detail: `${spec.kind}, ${payload.hits} hits, ${profile.damageType ?? 'custom'} (${getProfilePierce(profile)}% pierce), ${payload.damageMultiplier.toFixed(3)}x` });
 
     for (let index = 0; index < payload.hits && target.stats.health > 0; index++) {
         dispatchAbilityEvent(context, 'BEFORE_HIT', { ...payload, hitIndex: index });
@@ -146,11 +173,9 @@ function resolveAttack(state, spec, queue, rules) {
         damage += actual;
         hitDamage.push(actual);
         recordResolvedHit(state, attacker.id, actual);
-        addEvent(state, {
-            type: 'HIT_RESOLVED', attackerId: attacker.id, targetId: target.id,
+        addEvent(state, { type: 'HIT_RESOLVED', attackerId: attacker.id, targetId: target.id,
             source: spec.source ?? spec.kind, hit: index + 1, damage: actual,
-            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${payload.hits})`
-        });
+            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${payload.hits}; ${profile.damageType ?? 'custom'}, ${getProfilePierce(profile)}% pierce; raw ${rawPerHit.toFixed(0)}, armour ${target.stats.armour})` });
         dispatchAbilityEvent(context, 'HIT_RESOLVED', { ...payload, hitIndex: index, damage: actual });
     }
 
@@ -159,17 +184,13 @@ function resolveAttack(state, spec, queue, rules) {
 
     if (spec.kind === 'active') {
         completedActive(state, attacker.id, target.id);
-        addEvent(state, {
-            type: 'ACTIVE_COMPLETED', attackerId: attacker.id,
-            detail: `${attacker.name} active completed`
-        });
+        addEvent(state, { type: 'ACTIVE_COMPLETED', attackerId: attacker.id,
+            detail: `${attacker.name} active completed` });
         dispatchAbilityEvent(context, 'ACTIVE_COMPLETED', payload);
     }
 
-    addEvent(state, {
-        type: 'ATTACK_COMPLETED', attackerId: attacker.id,
-        detail: `${damage.toLocaleString()} total damage`
-    });
+    addEvent(state, { type: 'ATTACK_COMPLETED', attackerId: attacker.id,
+        detail: `${damage.toLocaleString()} total damage` });
     dispatchAbilityEvent(context, 'ATTACK_COMPLETED', payload);
     return { damage, hits: hitDamage.length, hitDamage };
 }
@@ -205,10 +226,8 @@ export function performCombatAction(previous, options) {
     }
 
     turn.acted[actor.id] = true;
-    addEvent(state, {
-        type: 'ACTION_COMPLETED', attackerId: actor.id,
-        detail: `${actor.name} finished their action`
-    });
+    addEvent(state, { type: 'ACTION_COMPLETED', attackerId: actor.id,
+        detail: `${actor.name} finished their action` });
     return state;
 }
 

@@ -13,12 +13,12 @@
             "armour": 2396,
             "damage": 1054,
             "hits": 3,
-            "pierce": 100,
+            "pierce": 80,
             "xpLevel": 50,
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "D3 Legendary Star reference stats; gear bonuses excluded. Confirm attack type, pierce and selected melee/ranged mode before interpreting damage. Ranged hit count is unverified (0 means not configured).",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -29,13 +29,15 @@
         "attacks": {
             "melee": {
                 "hits": 3,
-                "pierce": 100,
-                "damageType": null
+                "damageType": "piercing",
+                "pierce": 80,
+                "range": 1
             },
             "ranged": {
                 "hits": 0,
+                "damageType": null,
                 "pierce": null,
-                "damageType": null
+                "range": 0
             }
         }
     },
@@ -58,7 +60,7 @@
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "D3 Legendary Star reference stats; gear bonuses excluded. Confirm attack type, pierce and selected melee/ranged mode before interpreting damage. Ranged hit count is unverified (0 means not configured).",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -69,18 +71,22 @@
         "attacks": {
             "melee": {
                 "hits": 3,
+                "damageType": "power",
                 "pierce": 40,
-                "damageType": null
+                "range": 1
             },
             "ranged": {
                 "hits": 0,
+                "damageType": null,
                 "pierce": null,
-                "damageType": null
+                "range": 0
             }
         },
         "activeAttack": {
             "hits": 3,
-            "pierce": 40
+            "damageType": "eviscerating",
+            "pierce": 50,
+            "range": 1
         }
     },
     {
@@ -97,12 +103,12 @@
             "armour": 2011,
             "damage": 3832,
             "hits": 1,
-            "pierce": 0,
+            "pierce": 40,
             "xpLevel": 50,
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "D3 Legendary Star reference stats; gear bonuses excluded. Confirm attack type, pierce and selected melee/ranged mode before interpreting damage. Ranged hit count is unverified (0 means not configured).",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -113,14 +119,22 @@
         "attacks": {
             "melee": {
                 "hits": 1,
-                "pierce": 0,
-                "damageType": null
+                "damageType": "power",
+                "pierce": 40,
+                "range": 1
             },
             "ranged": {
                 "hits": 0,
+                "damageType": null,
                 "pierce": null,
-                "damageType": null
+                "range": 0
             }
+        },
+        "activeAttack": {
+            "hits": 1,
+            "damageType": "power",
+            "pierce": 40,
+            "range": 1
         }
     },
     {
@@ -136,13 +150,13 @@
             "health": 9584,
             "armour": 2490,
             "damage": 2490,
-            "hits": 1,
-            "pierce": 0,
+            "hits": 2,
+            "pierce": 50,
             "xpLevel": 50,
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "D3 Legendary Star reference stats; gear bonuses excluded. Confirm attack type, pierce and selected melee/ranged mode before interpreting damage. Ranged hit count is unverified (0 means not configured).",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -152,14 +166,16 @@
         "source": "https://tacticus.wiki.gg/wiki/Boss_Gulgortz",
         "attacks": {
             "melee": {
-                "hits": 1,
-                "pierce": 0,
-                "damageType": null
+                "hits": 2,
+                "damageType": "eviscerating",
+                "pierce": 50,
+                "range": 1
             },
             "ranged": {
-                "hits": 0,
-                "pierce": null,
-                "damageType": null
+                "hits": 1,
+                "damageType": "projectile",
+                "pierce": 15,
+                "range": 3
             }
         }
     },
@@ -177,12 +193,12 @@
             "armour": 1724,
             "damage": 4794,
             "hits": 1,
-            "pierce": 0,
+            "pierce": 40,
             "xpLevel": 50,
             "activeLevel": 50,
             "passiveLevel": 50
         },
-        "notes": "D3 Legendary Star reference stats; gear bonuses excluded. Confirm attack type, pierce and selected melee/ranged mode before interpreting damage. Ranged hit count is unverified (0 means not configured).",
+        "notes": "Reference stats exclude equipment. Attack profiles use wiki-listed damage types; verify ability-specific scaling against gameplay.",
         "progression": {
             "rank": "Diamond III",
             "rarity": "Legendary",
@@ -193,13 +209,15 @@
         "attacks": {
             "melee": {
                 "hits": 1,
-                "pierce": 0,
-                "damageType": null
+                "damageType": "power",
+                "pierce": 40,
+                "range": 1
             },
             "ranged": {
-                "hits": 0,
-                "pierce": null,
-                "damageType": null
+                "hits": 1,
+                "damageType": "molecular",
+                "pierce": 60,
+                "range": 2
             }
         }
     }

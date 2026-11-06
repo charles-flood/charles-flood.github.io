@@ -62,3 +62,23 @@ assert.throws(() => performCombatAction(distant, {
     attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'normal'
 }), /adjacency/);
 console.log('Growth, passive follow-up, Laviscus percentage and positioning tests passed');
+
+// Normal and triggered profiles retain their own piercing properties.
+import { DAMAGE_TYPES, getProfilePierce } from './engine.js';
+assert.equal(DAMAGE_TYPES.piercing, 80);
+assert.equal(getProfilePierce({ damageType: 'molecular' }), 60);
+assert.equal(getProfilePierce({ damageType: 'molecular', pierce: 55 }), 55);
+const ranged = make();
+ranged.units.find(u => u.id === 'gulgortz').position = { q: 2, r: 2 };
+const rangedResult = performCombatAction(ranged, {
+    attackerId: 'gulgortz', targetId: 'screamer-killer', kind: 'normal', attackType: 'ranged'
+});
+assert.ok(rangedResult.log.some(x => x.type === 'ATTACK_STARTED' && x.detail.includes('15% pierce')));
+assert.throws(() => performCombatAction(ranged, {
+    attackerId: 'gulgortz', targetId: 'screamer-killer', kind: 'normal', attackType: 'melee'
+}), /adjacency/);
+const passive = performCombatAction(make(), {
+    attackerId: 'kariyan', targetId: 'screamer-killer', kind: 'normal'
+});
+assert.ok(passive.log.some(x => x.type === 'ATTACK_STARTED' && x.detail.includes('80% pierce')));
+console.log('Damage-type registry, ranged reach and passive pierce tests passed');

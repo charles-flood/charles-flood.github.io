@@ -9,10 +9,8 @@ export const DEFAULT_RULES = {
 
 export const ABILITY_DEFINITIONS = [
     { ownerId: 'kariyan', id: 'kariyanGrowth', event: 'BEFORE_ATTACK', handler: 'growth' },
-    {
-        ownerId: 'kariyan', id: 'kariyanFollowUp', event: 'ATTACK_COMPLETED', handler: 'followUp',
-        attack: { hits: 1, pierce: 100 }, requiresTargetTrait: 'Big Target'
-    },
+    { ownerId: 'kariyan', id: 'kariyanFollowUp', event: 'ATTACK_COMPLETED', handler: 'followUp',
+        attack: { hits: 1, damageType: 'piercing', pierce: 80, range: 1 }, requiresTargetTrait: 'Big Target' },
     { ownerId: 'trajann', id: 'trajannExtraHits', event: 'BEFORE_ATTACK', handler: 'extraHits' },
     { ownerId: 'laviscus', id: 'laviscusSnapshot', event: 'BEFORE_ATTACK', handler: 'snapshot' }
 ];
@@ -104,30 +102,25 @@ export function dispatchAbilityEvent(context, event, payload) {
             if (activated) {
                 payload.hits += rules.trajannExtraHits;
                 turn.trajannConsumed[payload.attacker.id] = true;
-                emit({
-                    type: 'BONUS_HITS', attackerId: payload.attacker.id, source: definition.id,
-                    detail: `+${rules.trajannExtraHits} hits`
-                });
+                emit({ type: 'BONUS_HITS', attackerId: payload.attacker.id, source: definition.id,
+                    detail: `+${rules.trajannExtraHits} hits` });
             }
         }
 
         if (definition.handler === 'snapshot' && payload.attacker.id === owner.id) {
             const snapshot = laviscusSnapshot(state, owner.id);
             payload.flatDamageBonus += snapshot.total * rules.laviscusHighestHitPercentage;
-            emit({
-                type: 'LAVISCUS_SNAPSHOT', attackerId: owner.id,
-                detail: `Highest hits ${JSON.stringify(snapshot.contributions)}; ${(rules.laviscusHighestHitPercentage * 100).toFixed(1)}% of ${snapshot.total}`
-            });
+            emit({ type: 'LAVISCUS_SNAPSHOT', attackerId: owner.id,
+                detail: `Highest hits ${JSON.stringify(snapshot.contributions)}; ${
+                    (rules.laviscusHighestHitPercentage * 100).toFixed(1)}% of ${snapshot.total}` });
         }
 
         if (definition.handler === 'followUp' && payload.attacker.id === owner.id &&
             payload.kind !== 'passive' && payload.target.stats.health > 0 &&
             payload.target.traits?.includes(definition.requiresTargetTrait)) {
-            context.enqueue({
-                attackerId: owner.id, targetId: payload.target.id,
+            context.enqueue({ attackerId: owner.id, targetId: payload.target.id,
                 kind: 'passive', source: 'Kariyan follow-up passive (provisional)',
-                profile: { ...definition.attack }
-            });
+                profile: { ...definition.attack } });
         }
     }
 }

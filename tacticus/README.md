@@ -46,3 +46,17 @@ Copy the `tacticus/` folder to your repository branch. No homepage changes. Exis
 The event dispatcher is extensible, but **not every champion ability is implemented**. Position-sensitive buffs beyond Trajann, elevation, per-hit dynamic damage modifiers, healing, crits, armour rules and Gulgortz/Vitruvius effects remain pending.
 
 This archive is based on the previously supplied Milestone 2 ZIP, not a live checkout of Git commit `83c0483`. Compare with your branch before copying; any edits made after that archive are not included.
+
+### Damage profiles (Milestone 4)
+
+Damage-type pierce ratios are centralised in `engine.js` and mirrored in
+`data/damage-types.json` for reference. Each normal or triggered attack uses its
+own damage type, pierce ratio, hit count and (where applicable) range.
+
+Normal ranged attacks must be more than one hex away and within the profile
+range, measured to the nearest hex of a multi-hex target. The data file now
+includes melee and ranged profiles for the five starting characters.
+
+Existing browser saves can override bundled defaults. Use **Load reference
+stats** to adopt new profiles if you previously edited or saved attack values.
+Ability scaling, crits, elevation and other damage effects remain provisional.
