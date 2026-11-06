@@ -60,3 +60,13 @@ includes melee and ranged profiles for the five starting characters.
 Existing browser saves can override bundled defaults. Use **Load reference
 stats** to adopt new profiles if you previously edited or saved attack values.
 Ability scaling, crits, elevation and other damage effects remain provisional.
+
+### Combat debug exports (Milestone 4.1)
+
+Use **Export JSON** in Combat history to download a detailed report with
+chronological events, unit stats, attack profiles, positions, battlefield tiles,
+turn/battle counters and rule overrides. Share this file to diagnose attack
+ordering, pierce, passives and positioning. **Export TXT** provides a readable
+summary of the same events. Neither export uploads data to a server; both are
+created locally in the browser. Exports reflect the current state only (not
+previously undone actions), and clearing the log removes past entries.

@@ -209,6 +209,85 @@ function renderLog() {
     }).join('');
 }
 
+function makeCombatReport() {
+    return {
+        schemaVersion: 1,
+        reportType: 'tacticus-combat-debug',
+        exportedAt: new Date().toISOString(),
+        turn: state.turn,
+        rules: clone(state.rules ?? {}),
+        units: state.units.map(u => ({
+            id: u.id,
+            name: u.name,
+            team: u.team,
+            position: clone(u.position),
+            footprint: clone(u.footprint ?? [{ q: 0, r: 0 }]),
+            stats: clone(u.stats),
+            attacks: clone(u.attacks ?? {}),
+            activeAttack: clone(u.activeAttack ?? null),
+            traits: clone(u.traits ?? [])
+        })),
+        tiles: clone(state.tiles),
+        battle: clone(state.battle ?? {}),
+        combat: clone(state.combat ?? {}),
+        // Logs are stored newest-first for the UI; export oldest-first for analysis.
+        log: clone(state.log).reverse()
+    };
+}
+
+function downloadCombatReport(filename, content, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function formatCombatReport(report) {
+    const lines = [
+        'TACTICUS COMBAT DEBUG REPORT',
+        `Exported: ${report.exportedAt}`,
+        `Current turn: ${report.turn}`,
+        `Log entries: ${report.log.length}`,
+        '',
+        'UNITS',
+        ...report.units.map(u =>
+            `${u.name} (${u.id}) | ${u.team} | hex ${u.position.q},${u.position.r} | ` +
+            `HP ${u.stats.health}, armour ${u.stats.armour}, damage ${u.stats.damage}`
+        ),
+        '',
+        'RULE OVERRIDES',
+        JSON.stringify(report.rules, null, 4),
+        '',
+        'BATTLE COUNTERS',
+        JSON.stringify(report.battle, null, 4),
+        '',
+        'COMBAT STATE',
+        JSON.stringify(report.combat, null, 4),
+        '',
+        'CHRONOLOGICAL COMBAT LOG'
+    ];
+
+    for (const entry of report.log) {
+        if (entry.kind === 'turn') {
+            lines.push(`Turn ${entry.turn} started`);
+        } else if (entry.kind === 'event') {
+            lines.push(`[Turn ${entry.turn}] ${entry.type} | ${entry.attackerId ?? '-'} | ${entry.detail ?? ''}`);
+        } else {
+            lines.push(`[Turn ${entry.turn}] ${entry.attacker ?? '-'} -> ${entry.target ?? '-'} | ` +
+                `${entry.damage ?? 0} damage | ${entry.hits ?? '?'} hits | ` +
+                `${entry.damageType ?? entry.attackType ?? 'unknown'} | ${entry.pierce ?? '?'}% pierce`);
+        }
+    }
+
+    return lines.join('\n') + '\n';
+}
+
 function bind() {
     $('unitSelect').addEventListener('change', e => { selectedId = e.target.value; selectedTile = { ...unit(selectedId).position }; render(); });
     fields.forEach(f => $(f).addEventListener('change', e => { const n = Number(e.target.value); if (!Number.isFinite(n))
@@ -274,6 +353,22 @@ function bind() {
     $('nextTurnBtn').onclick = () => { snapshot(); state = advanceTurn(state); render(); };
     $('resetBattleBtn').onclick = () => { if (!confirm('Reset combat history and turn counter? Unit stats and positions will remain.'))
         return; snapshot(); state.log = []; state.turn = 1; state.combat = undefined; state.battle = undefined; render(); };
+    $('exportCombatJsonBtn').onclick = () => {
+        const report = makeCombatReport();
+        downloadCombatReport(
+            `tacticus-combat-turn-${report.turn}.json`,
+            JSON.stringify(report, null, 4),
+            'application/json'
+        );
+    };
+    $('exportCombatTxtBtn').onclick = () => {
+        const report = makeCombatReport();
+        downloadCombatReport(
+            `tacticus-combat-turn-${report.turn}.txt`,
+            formatCombatReport(report),
+            'text/plain;charset=utf-8'
+        );
+    };
     $('clearLogBtn').onclick = () => { snapshot(); state.log = []; render(); };
     $('loadStatsBtn').onclick = () => { if (!confirm('Replace character and boss stats with bundled reference values? Positions and combat log will be kept.'))
         return; snapshot(); for (const u of state.units) {
