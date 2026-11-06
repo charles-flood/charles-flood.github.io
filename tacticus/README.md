@@ -30,3 +30,19 @@ The boss remains stationary and does not act. No adds or summons are simulated.
 ## Installation and save compatibility
 
 Copy the `tacticus/` folder to your repository branch. No homepage changes. Existing local saves are retained and combat state is initialized on demand. Export saves before testing new mechanics. Undo snapshots include turn state and the event log.
+
+## Milestone 3 — generic ability-event foundation
+
+- Ability definitions register handlers for `BEFORE_ATTACK`, `BEFORE_HIT`, `HIT_RESOLVED`, `ACTIVE_COMPLETED` and `ATTACK_COMPLETED`; follow-up attacks enter a shared FIFO queue (100-attack safety cap).
+- Kariyan's battle-long attack counter includes normal, active and passive attacks; the next attack gets a provisional additive multiplier. Counters persist across turns and reset on Reset Battle.
+- Kariyan's passive follow-up now also triggers after a normal attack against a Big Target.
+- Trajann's bonus is only consumed when actually granted; normal attacks do not consume it.
+- Laviscus's snapshot adds a **percentage** of each ally's highest resolved hit, not the full sum. This is still a provisional **flat pre-armour damage-per-hit** interpretation, not a verified in-game formula.
+- Normal melee attacks require adjacency to any occupied boss hex; normal ranged attacks use `attacks.ranged.range` (fallback 3). Active ability range is not yet modelled.
+- Kariyan's provisional three-hit active profile is configured in `data/characters.json` as `activeAttack`.
+
+**Unverified example parameters** in `abilities.js`: `kariyanGrowthPerAttack: 0.10`, `laviscusHighestHitPercentage: 0.20`, `trajannExtraHits: 2`. These are **test placeholders, not verified game values**. Override with `state.rules` when scripting tests, e.g. `{ laviscusHighestHitPercentage: 0.25 }`. The formula, rounding, attack eligibility, active profiles and actual percentages still need validation against footage.
+
+The event dispatcher is extensible, but **not every champion ability is implemented**. Position-sensitive buffs beyond Trajann, elevation, per-hit dynamic damage modifiers, healing, crits, armour rules and Gulgortz/Vitruvius effects remain pending.
+
+This archive is based on the previously supplied Milestone 2 ZIP, not a live checkout of Git commit `83c0483`. Compare with your branch before copying; any edits made after that archive are not included.

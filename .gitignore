@@ -1,0 +1,19 @@
+# Visual Studio Code settings
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.log
+*.bak
+
+# Node.js dependencies (if used for testing)
+node_modules/
+
+# Local environment files
+.env
+.env.local

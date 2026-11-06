@@ -49,11 +49,13 @@ export function isOccupied(state, hex, exceptId = null) {
 // The existing attack() is retained for backwards compatibility. The event-driven
 // action resolver below is used by the UI for all new attacks and abilities.
 import {
+    DEFAULT_RULES,
+    ensureBattleState,
     ensureTurnState,
     resetTurnState,
     recordResolvedHit,
-    laviscusSnapshot,
-    completedActive
+    completedActive,
+    dispatchAbilityEvent
 } from './abilities.js';
 
 export function hexDistance(a, b) {
@@ -70,6 +72,12 @@ export function adjacentToUnit(first, second) {
     );
 }
 
+export function distanceToUnit(first, second) {
+    return Math.min(...occupiedHexes(first).flatMap(a =>
+        occupiedHexes(second).map(b => hexDistance(a, b))
+    ));
+}
+
 function addEvent(state, event) {
     const turn = ensureTurnState(state);
     const record = { turn: state.turn, ...event };
@@ -77,67 +85,61 @@ function addEvent(state, event) {
     state.log.unshift({ kind: 'event', ...record });
 }
 
-function resolveAttack(state, spec) {
+function resolveAttack(state, spec, queue, rules) {
     const attacker = state.units.find(unit => unit.id === spec.attackerId);
     const target = state.units.find(unit => unit.id === spec.targetId);
+
     if (!attacker || !target || attacker.team === target.team) {
         throw Error('Choose an attacker and an opposing target.');
     }
     if (target.stats.health <= 0) {
         throw Error('Target has no health remaining.');
     }
-    const profile = spec.profile ?? attacker.attacks?.[spec.attackType ?? 'melee'];
+
+    const attackType = spec.attackType ?? 'melee';
+    const profile = spec.profile ?? attacker.attacks?.[attackType];
     if (!profile || !Number.isFinite(profile.hits) || profile.hits < 1 || !Number.isFinite(profile.pierce)) {
         throw Error('Configure the attack hits and pierce before resolving this attack.');
     }
 
-    const turn = ensureTurnState(state);
-    let hits = Math.floor(profile.hits);
-    const baseHits = hits;
-    const trajann = state.units.find(unit => unit.id === 'trajann');
-    const qualifyingActive = turn.completedActives.some(active => {
-        const actor = state.units.find(unit => unit.id === active.actorId);
-        return actor && adjacentToUnit(actor, target);
-    });
-
-    // Modelled as once per attacking unit, per turn, on the first eligible
-    // non-normal attack. The two bonus hits are a provisional level-50 value.
-    if (spec.kind !== 'normal' && !turn.trajannConsumed[attacker.id] && qualifyingActive) {
-        turn.trajannConsumed[attacker.id] = true;
-        if (trajann && adjacentToUnit(trajann, target)) {
-            hits += 2;
-            addEvent(state, {
-                type: 'BONUS_HITS',
-                attackerId: attacker.id,
-                source: 'Trajann passive',
-                detail: '+2 hits on this qualifying non-normal attack'
-            });
-        } else {
-            addEvent(state, {
-                type: 'CONDITION',
-                attackerId: attacker.id,
-                detail: 'Trajann not adjacent; no extra hits'
-            });
-        }
+    // The selected attack profile determines range; multi-hex footprints count in full.
+    if (spec.kind === 'normal' && attackType === 'melee' && !adjacentToUnit(attacker, target)) {
+        throw Error('Melee attacks require adjacency to the target footprint.');
+    }
+    if (spec.kind === 'normal' && attackType === 'ranged' &&
+        distanceToUnit(attacker, target) > (profile.range ?? 3)) {
+        throw Error('Target is outside the configured ranged attack distance.');
     }
 
-    const laviscus = attacker.id === 'laviscus' ? laviscusSnapshot(state) : null;
-    const extraDamage = laviscus?.total ?? 0;
-    if (laviscus) {
-        addEvent(state, {
-            type: 'LAVISCUS_SNAPSHOT',
-            attackerId: attacker.id,
-            detail: `Highest hits locked: ${JSON.stringify(laviscus.contributions)}; sum ${extraDamage}`
-        });
-    }
+    const payload = {
+        attacker,
+        target,
+        kind: spec.kind,
+        hits: Math.floor(profile.hits),
+        damageMultiplier: 1,
+        flatDamageBonus: spec.flatBonus ?? 0
+    };
+    const context = {
+        state,
+        rules,
+        adjacentToUnit,
+        emit: event => addEvent(state, event),
+        enqueue: attack => queue.push(attack)
+    };
 
+    dispatchAbilityEvent(context, 'BEFORE_ATTACK', payload);
     const pierce = Math.max(0, Math.min(1, profile.pierce / 100));
-    const rawPerHit = Math.max(0, attacker.stats.damage + (spec.flatBonus ?? 0) + extraDamage);
+    const rawPerHit = Math.max(0, (attacker.stats.damage + payload.flatDamageBonus) * payload.damageMultiplier);
     let damage = 0;
     const hitDamage = [];
-    addEvent(state, { type: 'ATTACK_STARTED', attackerId: attacker.id, detail: `${spec.kind}, ${baseHits} base hits` });
 
-    for (let index = 0; index < hits; index++) {
+    addEvent(state, {
+        type: 'ATTACK_STARTED', attackerId: attacker.id,
+        detail: `${spec.kind}, ${payload.hits} hits, ${payload.damageMultiplier.toFixed(3)}x`
+    });
+
+    for (let index = 0; index < payload.hits && target.stats.health > 0; index++) {
+        dispatchAbilityEvent(context, 'BEFORE_HIT', { ...payload, hitIndex: index });
         const calculated = Math.floor(Math.max(rawPerHit - target.stats.armour, rawPerHit * pierce, 0));
         const actual = Math.min(calculated, target.stats.health);
         target.stats.health -= actual;
@@ -145,18 +147,31 @@ function resolveAttack(state, spec) {
         hitDamage.push(actual);
         recordResolvedHit(state, attacker.id, actual);
         addEvent(state, {
-            type: 'HIT_RESOLVED',
-            attackerId: attacker.id,
-            targetId: target.id,
-            source: spec.source ?? spec.kind,
-            hit: index + 1,
-            damage: actual,
-            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${hits})`
+            type: 'HIT_RESOLVED', attackerId: attacker.id, targetId: target.id,
+            source: spec.source ?? spec.kind, hit: index + 1, damage: actual,
+            detail: `${actual.toLocaleString()} damage (hit ${index + 1}/${payload.hits})`
         });
+        dispatchAbilityEvent(context, 'HIT_RESOLVED', { ...payload, hitIndex: index, damage: actual });
     }
 
-    addEvent(state, { type: 'ATTACK_COMPLETED', attackerId: attacker.id, detail: `${damage.toLocaleString()} total damage` });
-    return { damage, hits, hitDamage };
+    ensureBattleState(state).attacksByUnit[attacker.id] =
+        (state.battle.attacksByUnit[attacker.id] ?? 0) + 1;
+
+    if (spec.kind === 'active') {
+        completedActive(state, attacker.id, target.id);
+        addEvent(state, {
+            type: 'ACTIVE_COMPLETED', attackerId: attacker.id,
+            detail: `${attacker.name} active completed`
+        });
+        dispatchAbilityEvent(context, 'ACTIVE_COMPLETED', payload);
+    }
+
+    addEvent(state, {
+        type: 'ATTACK_COMPLETED', attackerId: attacker.id,
+        detail: `${damage.toLocaleString()} total damage`
+    });
+    dispatchAbilityEvent(context, 'ATTACK_COMPLETED', payload);
+    return { damage, hits: hitDamage.length, hitDamage };
 }
 
 export function performCombatAction(previous, options) {
@@ -171,38 +186,29 @@ export function performCombatAction(previous, options) {
     }
 
     const active = options.kind === 'active';
-    const profile = active && actor.id === 'kariyan'
-        ? { hits: 3, pierce: options.activePierce ?? actor.attacks?.melee?.pierce }
-        : null;
-    const primary = resolveAttack(state, {
+    const queue = [{
         ...options,
-        profile,
         kind: active ? 'active' : 'normal',
-        source: active ? `${actor.name} active (provisional)` : 'Normal attack'
-    });
+        source: active ? `${actor.name} active (provisional)` : 'Normal attack',
+        profile: active && actor.activeAttack
+            ? { ...actor.activeAttack }
+            : undefined
+    }];
+    const rules = { ...DEFAULT_RULES, ...state.rules };
+    let processed = 0;
 
-    if (active) {
-        // An active completes before its after-attack passive can trigger.
-        completedActive(state, actor.id, options.targetId);
-        addEvent(state, { type: 'ACTIVE_COMPLETED', attackerId: actor.id, detail: `${actor.name} active completed` });
-
-        if (actor.id === 'kariyan') {
-            const target = state.units.find(unit => unit.id === options.targetId);
-            if (target?.traits?.includes('Big Target') && target.stats.health > 0) {
-                resolveAttack(state, {
-                    attackerId: actor.id,
-                    targetId: target.id,
-                    kind: 'passive',
-                    source: 'Kariyan follow-up passive (provisional)',
-                    profile: { hits: 1, pierce: 100 },
-                    flatBonus: options.passiveBonus ?? 0
-                });
-            }
+    while (queue.length > 0) {
+        if (++processed > 100) {
+            throw Error('Triggered attack safety limit exceeded.');
         }
+        resolveAttack(state, queue.shift(), queue, rules);
     }
 
     turn.acted[actor.id] = true;
-    addEvent(state, { type: 'ACTION_COMPLETED', attackerId: actor.id, detail: `${actor.name} finished their action` });
+    addEvent(state, {
+        type: 'ACTION_COMPLETED', attackerId: actor.id,
+        detail: `${actor.name} finished their action`
+    });
     return state;
 }
 
