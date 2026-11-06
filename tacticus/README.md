@@ -46,3 +46,46 @@ Copy the `tacticus/` folder to your repository branch. No homepage changes. Exis
 The event dispatcher is extensible, but **not every champion ability is implemented**. Position-sensitive buffs beyond Trajann, elevation, per-hit dynamic damage modifiers, healing, crits, armour rules and Gulgortz/Vitruvius effects remain pending.
 
 This archive is based on the previously supplied Milestone 2 ZIP, not a live checkout of Git commit `83c0483`. Compare with your branch before copying; any edits made after that archive are not included.
+
+### Damage profiles (Milestone 4)
+
+Damage-type pierce ratios are centralised in `engine.js` and mirrored in
+`data/damage-types.json` for reference. Each normal or triggered attack uses its
+own damage type, pierce ratio, hit count and (where applicable) range.
+
+Normal ranged attacks must be more than one hex away and within the profile
+range, measured to the nearest hex of a multi-hex target. The data file now
+includes melee and ranged profiles for the five starting characters.
+
+Existing browser saves can override bundled defaults. Use **Load reference
+stats** to adopt new profiles if you previously edited or saved attack values.
+Ability scaling, crits, elevation and other damage effects remain provisional.
+
+### Combat debug exports (Milestone 4.1)
+
+Use **Export JSON** in Combat history to download a detailed report with
+chronological events, unit stats, attack profiles, positions, battlefield tiles,
+turn/battle counters and rule overrides. Share this file to diagnose attack
+ordering, pierce, passives and positioning. **Export TXT** provides a readable
+summary of the same events. Neither export uploads data to a server; both are
+created locally in the browser. Exports reflect the current state only (not
+previously undone actions), and clearing the log removes past entries.
+
+### Ability damage correction (Milestone 4.2)
+
+- Kariyan's level-50 active uses its own Eviscerating raw-damage range
+  (2,992–3,589), and his Big Target passive uses its own Piercing range
+  (4,786–5,983). For reproducible tests the engine currently uses the
+  midpoint of each range; actual in-game damage rolls can vary.
+- Trajann's passive independently adds 1,096 raw damage to qualifying hits
+  after a friendly adjacent unit has completed an active, while its separate
+  +2-hit effect remains limited to the first eligible non-normal attack.
+- Kariyan's provisional 33% additive growth now counts **previous turns** in
+  which he attacked, rather than individual attacks. The exact application
+  and stacking are subject to gameplay verification.
+- Laviscus's default Outrage percentage is now 120%. The simulator still
+  needs the full wiki eligibility conditions and timing implemented.
+- The simplified armour calculation remains `floor(max(raw - armour,
+  raw * pierceRatio))`. Damage-type pierce ratios are unchanged.
+- The browser's saved state can override bundled character defaults. Use
+  **Load reference stats** when validating the updated attack profiles.
